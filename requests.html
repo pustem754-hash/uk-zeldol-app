@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Заявки — ЖК «Зелёная Долина»</title>
+  <style>
+    *{box-sizing:border-box}
+    
+    /* ===== Палитра (как в логотипе) ===== */
+    :root{
+      --green:#2d7c33;
+      --green-dark:#25682a;
+      --bg1:#165c2d;
+      --bg2:#125026;
+      --green-900:#0f3a17;
+      --green-800:#145422;
+      --green-700:#1a6b2b;
+      --green-600:#1f8a2f;
+      --green-500:#2bbf47;
+      --panel-bg: rgba(255,255,255,0.10);
+      --panel-bg-strong: rgba(255,255,255,0.14);
+      --text-on-dark:#f4f6f5;
+      --text-muted:rgba(255,255,255,0.75);
+      --text-dark:#0f2a14;
+      --border-soft: rgba(255,255,255,0.22);
+    }
+
+    /* ===== Общий стиль ===== */
+    body {
+      background: #DCEDC8;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+      color: var(--text-dark);
+      font-family: "Inter", system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Заголовки */
+    h1, h2, h3 {
+      color: var(--green-dark);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 16px;
+    }
+
+    /* Логотип */
+    .logo-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .logo-header img {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    @media (max-width: 768px) {
+      .logo-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .logo-header img {
+        height: 48px;
+      }
+    }
+
+    /* Контейнер */
+    .wrap {
+      max-width: 1600px;
+      margin: 14px auto;
+      padding: 24px;
+    }
+
+    .requests-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    /* Карточки / панели - КРЕАТИВНЫЙ ДИЗАЙН */
+    .request-form,
+    .requests-table,
+    .card {
+      flex: 1 1 35%;
+      background: #ffffff;
+      border: 2px solid #C8E6C9;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(46,125,50,0.15),
+                  0 2px 8px rgba(76,175,80,0.1);
+      padding: 24px;
+      overflow: visible;
+      position: relative;
+      z-index: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .request-form:hover,
+    .requests-table:hover,
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(76,175,80,0.2),
+                  0 4px 12px rgba(102,187,106,0.15);
+      border-color: #81C784;
+    }
+    
+    .request-form::before,
+    .requests-table::before,
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #8BC34A 0%, #66BB6A 30%, #4CAF50 70%, #2E7D32 100%);
+      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+      z-index: 1;
+    }
+
+    .requests-table {
+      flex: 1 1 60%;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 10px 0 6px;
+      color: var(--green-dark);
+    }
+
+    /* ====== INPUT / SELECT (контрастный) ====== */
+    .request-form label {
+      color: var(--green-dark);
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .request-form input,
+    .request-form textarea,
+    .request-form select,
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255,255,255,0.92);
+      color: var(--text-dark);
+      font-size: 15px;
+      outline: none;
+      transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+      appearance: none;
+    }
+
+    .request-form input::placeholder,
+    .request-form textarea::placeholder,
+    input::placeholder, textarea::placeholder {
+      color: #809488;
+    }
+
+    .request-form select:hover,
+    .request-form input:hover,
+    .request-form textarea:hover {
+      border-color: rgba(43,191,71,0.6);
+    }
+
+    .request-form select:focus,
+    .request-form input:focus,
+    .request-form textarea:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(43,191,71,0.25);
+      background: #fff;
+    }
+
+    /* Видимость стрелки у select (кастомная) */
+    .request-form .select-wrap {
+      position: relative;
+    }
+    .request-form .select-wrap select {
+      padding-right: 36px;
+    }
+    .request-form .select-wrap::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 7px solid var(--green-700);
+      pointer-events: none;
+    }
+
+    /* САМ СПИСОК: в большинстве браузеров можно задать option */
+    .request-form select option {
+      background: #ffffff !important;
+      color: var(--text-dark) !important;
+    }
+
+    /* В Edge/Chrome выпадающий список может быть зажат соседними блоками — поднимаем z-index */
+    .request-form select {
+      position: relative;
+      z-index: 2;
+    }
+    .request-form {
+      z-index: 1;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .request-form button,
+    .btn-primary {
+      background: #1f8a2f;
+      border: none;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .request-form button:hover,
+    .btn-primary:hover {
+      background: #28b83f;
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--green-dark);
+      border: 1px solid rgba(45,124,51,0.3);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .btn-danger {
+      background: rgba(220, 53, 69, 0.2);
+      color: #ff6b6b;
+      border-color: rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-danger:hover {
+      background: rgba(220, 53, 69, 0.3);
+    }
+
+    .hint {
+      color: rgba(15,42,20,0.7);
+      font-size: 13px;
+    }
+
+    /* ===== Таблица (никаких обрезаний) ===== */
+    .requests-table table{ 
+      width:100%; 
+      border-collapse: collapse; 
+      table-layout: fixed; 
+      min-width: 1400px;
+    }
+    .requests-table th, .requests-table td{
+      white-space: normal; 
+      word-break: break-word; 
+      line-height:1.3;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      padding: 10px 12px;
+    }
+
+    .requests-table thead{ 
+      background: var(--green-700); 
+    }
+    .requests-table th{ 
+      font-weight:700; 
+      text-align:center; 
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      color: #fff;
+    }
+    
+    .requests-table td{
+      color: var(--text-dark);
+    }
+
+    /* Полосатость + hover */
+    .requests-table tbody tr:nth-child(even){ 
+      background: rgba(232,245,233,0.5); 
+    }
+    .requests-table tbody tr:hover{ 
+      background: rgba(43,191,71,0.20); 
+      transition: 0.2s ease;
+    }
+
+    /* Колонки (чуть больше места статусам и действиям) */
+    .requests-table col.col-num{ width: 8%; }
+    .requests-table col.col-cat{ width: 18%; }
+    .requests-table col.col-desc{ width: 28%; }
+    .requests-table col.col-stat{ width: 16%; }
+    .requests-table col.col-date{ width: 16%; }
+    .requests-table col.col-acts{ width: 14%; }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 10px 12px;
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text-dark);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .filters input::placeholder {
+      color: #809488;
+    }
+
+    .filters select option {
+      background: #ffffff !important;
+      color: var(--text-dark) !important;
+    }
+
+    .search {
+      flex: 1 1 220px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* Выравнивание колонок */
+    .requests-table td:first-child,
+    .requests-table th:first-child {
+      text-align: center;
+    }
+
+    .requests-table td:nth-child(2),
+    .requests-table th:nth-child(2) {
+      text-align: left;
+    }
+
+    .requests-table td:nth-child(3),
+    .requests-table th:nth-child(3) {
+      text-align: left;
+      padding: 14px 20px;
+    }
+
+    .requests-table td:nth-child(4),
+    .requests-table th:nth-child(4) {
+      text-align: center;
+    }
+
+    .requests-table td:nth-child(5),
+    .requests-table th:nth-child(5) {
+      text-align: center;
+    }
+
+    /* Статусы — в одну строку, контрастные */
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 26px;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      color:#fff;
+    }
+    /* Единые цвета статусов */
+    .status-new{    background:#2196F3; color:#fff; font-weight:600; }
+    .status-work{   background:#FF9800; color:#fff; font-weight:600; }
+    .status-done{   background:#4CAF50; color:#fff; font-weight:600; }
+    .status-cancel{ background:#f44336; color:#fff; font-weight:600; }
+
+    /* Кнопки действий */
+    td.actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .requests-table .btn,
+    td.actions .btn{
+      background: var(--green-600);
+      color:#fff;
+      border:none;
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      transition: background .2s ease;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+    .requests-table .btn:hover,
+    td.actions .btn:hover{
+      background: var(--green-500);
+    }
+
+    /* Адаптив */
+    @media (max-width: 900px){
+      .requests-container{ flex-direction: column; gap:16px; padding:16px; }
+      .request-form, .requests-table{ padding:16px; }
+    }
+    @media (max-width: 768px){
+      .requests-table th, .requests-table td{ font-size:13px; padding:8px; }
+      .status-badge{ font-size:11px; padding:3px 8px; }
+    }
+
+    /* тост */
+    .toast {
+      position: fixed;
+      right: 16px;
+      top: 16px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-left: 6px solid #1f8a2f;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      padding: 10px 12px;
+      z-index: 9999;
+      animation: tin .18s ease;
+      color: #1f2937;
+    }
+    @keyframes tin {
+      from { opacity: .3; transform: translateY(-8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* модалка */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      padding: 16px;
+    }
+    .modal.open {
+      display: flex;
+    }
+    .modal-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      max-width: 560px;
+      width: 100%;
+      padding: 16px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+      color: #1f2937;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .close {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 10px;
+      padding: 6px 10px;
+      cursor: pointer;
+      color: #1f2937;
+    }
+    .gallery {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .thumb {
+      width: 84px;
+      height: 84px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid rgba(0, 0, 0, .08);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo-header">
+      <img src="/logo-original.png" alt="ЖК «Зелёная Долина»">
+      <h1 style="margin:0">Заявки (ремонт и обслуживание)</h1>
+    </div>
+
+    <div class="requests-container">
+      <!-- Форма создания заявки -->
+      <section class="request-form card">
+        <h3 style="margin:0 0 8px">Новая заявка</h3>
+        <label for="cat">Категория</label>
+        <div class="select-wrap">
+          <select id="cat">
+            <option value="plumbing">Водоснабжение / канализация</option>
+            <option value="electric">Электроснабжение</option>
+            <option value="heat">Отопление</option>
+            <option value="gas">Газ</option>
+            <option value="common">Общее имущество</option>
+            <option value="other">Другое</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div style="flex:1">
+            <label for="priority">Приоритет</label>
+            <div class="select-wrap">
+              <select id="priority">
+                <option value="normal">Обычный</option>
+                <option value="high">Срочно</option>
+              </select>
+            </div>
+          </div>
+          <div style="flex:1">
+            <label for="apartment">Помещение</label>
+            <div class="select-wrap">
+              <select id="apartment">
+                <option value="flat">Квартира №42</option>
+                <option value="store">Кладовая №15</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <label for="title">Кратко опишите проблему</label>
+        <input id="title" type="text" placeholder="Например: течёт кран в ванной"/>
+
+        <label for="desc">Подробности</label>
+        <textarea id="desc" placeholder="Когда заметили, где именно, есть ли доступ..."></textarea>
+
+        <label for="photos">Фото (необязательно)</label>
+        <input id="photos" type="file" accept="image/*" multiple />
+
+        <div class="row" style="justify-content:flex-end;margin-top:10px">
+          <button class="btn btn-ghost" type="button" id="clearForm">Очистить</button>
+          <button class="btn btn-primary" type="button" id="createBtn">Отправить заявку</button>
+        </div>
+        <p class="hint">После отправки заявке присвоится номер и она появится в списке справа.</p>
+      </section>
+
+      <!-- Список заявок -->
+      <section class="requests-table card">
+        <h2 style="margin:0 0 12px;color:var(--green-dark)">Мои заявки</h2>
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span class="hint" id="counter">—</span>
+        </div>
+
+        <div class="filters">
+          <input id="q" class="search" type="text" placeholder="Поиск по номеру или описанию"/>
+          <select id="fStatus">
+            <option value="">Все статусы</option>
+            <option value="new">Новая</option>
+            <option value="in_progress">В работе</option>
+            <option value="done">Выполнено</option>
+            <option value="cancel">Отменено</option>
+          </select>
+          <select id="fCat">
+            <option value="">Все категории</option>
+            <option value="plumbing">Водоснабжение</option>
+            <option value="electric">Электроснабжение</option>
+            <option value="heat">Отопление</option>
+            <option value="gas">Газ</option>
+            <option value="common">Общее имущество</option>
+            <option value="other">Другое</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <colgroup>
+              <col class="col-num">
+              <col class="col-cat">
+              <col class="col-desc">
+              <col class="col-stat">
+              <col class="col-date">
+              <col class="col-acts">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Категория</th>
+                <th>Описание</th>
+                <th>Статус</th>
+                <th>Дата</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Модалка подробностей -->
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="mTitle" style="margin:0"></h3>
+        <button class="close" id="mClose" type="button">✕</button>
+      </div>
+      <div id="mBody"></div>
+      <div class="gallery" id="mGallery"></div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px">
+        <button class="btn btn-danger" id="mCancel" type="button">Отменить заявку</button>
+        <button class="btn btn-primary" id="mDone" type="button">Отметить выполненной</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== helpers =====
+    const storeKey = 'zd_requests_v1';
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    const toast = txt => {
+      const t = document.createElement('div'); t.className='toast'; t.textContent=txt;
+      document.body.appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(-6px)'},1800);
+      setTimeout(()=>t.remove(),2050);
+    };
+    const nowISO = () => new Date().toISOString();
+    const fmtDate = iso => new Date(iso).toLocaleString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+    const catName = c => ({
+      plumbing:'Водоснабжение', electric:'Электроснабжение', heat:'Отопление',
+      gas:'Газ', common:'Общее имущество', other:'Другое'
+    }[c] || c);
+
+    const statusMeta = s => ({
+      new:['Новая','status-new'],
+      in_progress:['В работе','status-work'],
+      done:['Выполнено','status-done'],
+      cancel:['Отменено','status-cancel'],
+    }[s]);
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(storeKey)) || [] } catch { return [] }
+    }
+    function save(list){ localStorage.setItem(storeKey, JSON.stringify(list)) }
+
+    // ===== state =====
+    let items = load();
+    const counterEl = $('#counter');
+
+    // ===== form logic =====
+    $('#createBtn').addEventListener('click', async ()=>{
+      const cat = $('#cat').value;
+      const priority = $('#priority').value;
+      const apartment = $('#apartment').value;
+      const title = $('#title').value.trim();
+      const desc = $('#desc').value.trim();
+
+      if(!title){ toast('Опишите проблему'); $('#title').focus(); return }
+      if(desc.length<5){ toast('Добавьте подробности'); $('#desc').focus(); return }
+
+      const files = $('#photos').files;
+      const photos = [];
+      for (let i=0;i<Math.min(files.length,6);i++){
+        const b64 = await toBase64(files[i]); photos.push(b64);
+      }
+
+      const id = genId();
+      const rec = {
+        id, cat, priority, apartment, title, desc, photos,
+        status:'new',
+        createdAt: nowISO(),
+        history: [{at: nowISO(), status:'new', note:'Создано'}]
+      };
+      items.unshift(rec);
+      save(items);
+      render();
+      clearForm();
+      toast(`Заявка №${id} отправлена`);
+    });
+
+    $('#clearForm').addEventListener('click', clearForm);
+    function clearForm(){
+      $('#cat').value='plumbing'; $('#priority').value='normal'; $('#apartment').value='flat';
+      $('#title').value=''; $('#desc').value=''; $('#photos').value='';
+    }
+
+    function toBase64(file){
+      return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file) })
+    }
+    function genId(){ return (Math.random()*9e5+1e5|0) } // 6 цифр
+
+    // ===== render table =====
+    function render(){
+      counterEl.textContent = `Всего: ${items.length}`;
+      const q = $('#q').value.toLowerCase().trim();
+      const fs = $('#fStatus').value;
+      const fc = $('#fCat').value;
+
+      const rows = items.filter(r=>{
+        const hitQ = !q || (String(r.id).includes(q) || r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q));
+        const hitS = !fs || r.status===fs;
+        const hitC = !fc || r.cat===fc;
+        return hitQ && hitS && hitC;
+      });
+
+      $('#tbody').innerHTML = rows.map(r=>{
+        const [sName,sClass] = statusMeta(r.status);
+        return `<tr data-id="${r.id}">
+          <td>#${r.id}</td>
+          <td>${catName(r.cat)}</td>
+          <td title="${escapeHtml(r.desc)}">${escapeHtml(r.title)}</td>
+          <td class="col-stat"><span class="status-badge ${sClass}">${sName}</span></td>
+          <td class="col-date">${fmtDate(r.createdAt)}</td>
+          <td class="actions">
+            <button class="btn btn-ghost" data-action="view">Подробнее</button>
+            ${r.status!=='done' && r.status!=='cancel'
+              ? `<button class="btn btn-primary" data-action="start">В работу</button>
+                 <button class="btn btn-danger" data-action="cancel">Отменить</button>`
+              : `<button class="btn btn-primary" data-action="reopen">Открыть снова</button>`}
+          </td>
+        </tr>`
+      }).join('') || `<tr><td colspan="6" class="hint">Заявок пока нет</td></tr>`;
+    }
+
+    function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[c])) }
+
+    // фильтры
+    $('#q').addEventListener('input', render);
+    $('#fStatus').addEventListener('change', render);
+    $('#fCat').addEventListener('change', render);
+
+    // действия по строкам
+    $('#tbody').addEventListener('click', e=>{
+      const btn = e.target.closest('button'); if(!btn) return;
+      const tr = e.target.closest('tr'); const id = +tr.dataset.id;
+      const rec = items.find(x=>x.id===id); if(!rec) return;
+
+      const act = btn.dataset.action;
+      if(act==='view'){ openModal(rec); return }
+      if(act==='start'){ setStatus(rec,'in_progress','Принято в работу'); return }
+      if(act==='cancel'){ setStatus(rec,'cancel','Отменено пользователем'); return }
+      if(act==='reopen'){ setStatus(rec,'new','Открыто повторно'); return }
+    });
+
+    function setStatus(rec, status, note){
+      rec.status = status;
+      rec.history.push({at: nowISO(), status, note});
+      save(items); render();
+      const [name] = statusMeta(status); toast(`Заявка #${rec.id}: ${name}`);
+    }
+
+    // ===== modal =====
+    const modal = $('#modal'); const mTitle = $('#mTitle'); const mBody = $('#mBody'); const mGallery = $('#mGallery');
+    $('#mClose').addEventListener('click', ()=> modal.classList.remove('open'));
+    $('#mCancel').addEventListener('click', ()=> {
+      const id = +modal.dataset.id; const rec = items.find(x=>x.id===id); if(!rec) return;
+      setStatus(rec,'cancel','Отменено в карточке'); modal.classList.remove('open');
+    });
+    $('#mDone').addEventListener('click', ()=> {
+      const id = +modal.dataset.id; const rec = items.find(x=>x.id===id); if(!rec) return;
+      setStatus(rec,'done','Выполнено'); modal.classList.remove('open');
+    });
+
+    function openModal(rec){
+      modal.dataset.id = rec.id;
+      mTitle.textContent = `Заявка #${rec.id} — ${catName(rec.cat)}`;
+      const [sName,sClass] = statusMeta(rec.status);
+      mBody.innerHTML = `
+        <p><strong>Статус:</strong> <span class="status-badge ${sClass}">${sName}</span></p>
+        <p><strong>Приоритет:</strong> ${rec.priority==='high'?'Срочно':'Обычный'}</p>
+        <p><strong>Помещение:</strong> ${rec.apartment==='flat'?'Квартира №42':'Кладовая №15'}</p>
+        <p><strong>Тема:</strong> ${escapeHtml(rec.title)}</p>
+        <p><strong>Описание:</strong><br>${escapeHtml(rec.desc)}</p>
+        <p><strong>История статусов:</strong></p>
+        <ul style="margin:0 0 6px 16px">
+          ${rec.history.map(h=>`<li>${fmtDate(h.at)} — ${statusMeta(h.status)[0]}${h.note?': '+escapeHtml(h.note):''}</li>`).join('')}
+        </ul>
+      `;
+      mGallery.innerHTML = rec.photos?.length
+        ? rec.photos.map(src=>`<img class="thumb" src="${src}" alt="Фото по заявке #${rec.id}">`).join('')
+        : `<span class="hint">Фото не прикреплены</span>`;
+      modal.classList.add('open');
+    }
+
+    // стартовые данные (демо)
+    if(items.length===0){
+      items = [
+        {id:genId(),cat:'plumbing',priority:'normal',apartment:'flat',title:'Подтекает стояк в санузле',
+         desc:'Вода появляется под коробом, доступ есть.',photos:[],status:'in_progress',
+         createdAt:nowISO(),history:[{at:nowISO(),status:'new',note:'Создано'},{at:nowISO(),status:'in_progress',note:'Принято диспетчером'}]},
+        {id:genId(),cat:'electric',priority:'high',apartment:'flat',title:'Искрит розетка на кухне',
+         desc:'Нужно заменить блок.',photos:[],status:'new',createdAt:nowISO(),history:[{at:nowISO(),status:'new',note:'Создано'}]},
+        {id:genId(),cat:'common',priority:'normal',apartment:'store',title:'Не закрывается дверь в подъезде',
+         desc:'Петля разбалтывается.',photos:[],status:'done',createdAt:nowISO(),history:[{at:nowISO(),status:'new',note:'Создано'},{at:nowISO(),status:'done',note:'Выполнено'}]},
+      ];
+      save(items);
+    }
+    render();
+
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

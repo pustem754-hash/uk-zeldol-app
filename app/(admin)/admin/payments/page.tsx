@@ -1,0 +1,10 @@
+export default function AdminPaymentsPage() {
+  return (
+    <div className="container-uk py-8">
+      <h1>Управление платежами</h1>
+      {/* TODO: Добавить список платежей */}
+    </div>
+  );
+}
+
+

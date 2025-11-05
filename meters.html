@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Счётчики — ЖК Зелёная Долина</title>
+</head>
+<body>
+<section class="meters-page" aria-label="Показания счётчиков">
+  <div class="meters-header">
+    <button class="back-btn" type="button" onclick="history.back()">← Назад</button>
+    <img src="/logo-original.png" alt="УК «Зелёная Долина»">
+    <h2 class="page-title">Счётчики</h2>
+  </div>
+
+  <div class="meters-grid" id="metersGrid"><!-- карточки вставит JS --></div>
+
+  <div class="meters-summary">
+    <div class="summary-left">
+      <div class="summary-title">Итого к оплате:</div>
+      <div class="summary-total" id="summaryTotal">—</div>
+      <div class="draft-hint" id="draftHint" hidden>Черновик сохранён • <span id="draftTime"></span></div>
+    </div>
+    <div class="summary-actions">
+      <button class="btn-ghost" id="clearDraftBtn" type="button">Очистить черновик</button>
+      <button class="send-btn" id="sendBtn" type="button" disabled>✔ Передать показания</button>
+    </div>
+  </div>
+
+  <div class="meters-hint">
+    <div class="hint-title">💡 Как вводить показания</div>
+    <ul>
+      <li>Текущее показание не может быть меньше предыдущего.</li>
+      <li>Электроэнергия — целые значения. Вода и газ — можно дробные (например, <code>342.5</code>).</li>
+      <li>Расход и сумма рассчитываются автоматически.</li>
+    </ul>
+  </div>
+</section>
+
+<style>
+/* ===== фон в стиле приложения ===== */
+body{
+  background:#DCEDC8;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  color:#1A4D2E;
+  line-height:1.6;
+}
+
+/* ===== заголовок и back */
+.meters-header{max-width:1040px;margin:18px auto 8px;display:flex;gap:12px;align-items:center;padding:0 16px}
+.meters-header img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+.back-btn{background:#2d7c33;color:#fff;border:1px solid #2d7c33;border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer}
+.back-btn:hover{filter:brightness(1.07)}
+.page-title{margin:0;color:#fff;font-size:22px;font-weight:800}
+
+/* ===== сетка карточек ===== */
+.meters-grid{max-width:1040px;margin:0 auto;padding:0 16px 12px;display:grid;gap:16px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:760px){.meters-grid{grid-template-columns:1fr}}
+
+/* ===== карточка счётчика - КРЕАТИВНЫЙ ДИЗАЙН ===== */
+.meter-card{
+  background:linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+  border:1px solid rgba(129,199,132,0.25);
+  border-radius:20px;
+  padding:18px;
+  box-shadow:0 8px 24px rgba(46,125,50,0.1),
+             0 2px 8px rgba(76,175,80,0.08);
+  transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
+  position:relative;
+  overflow:hidden;
+}
+
+.meter-card::before {
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:4px;
+  background:linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+}
+
+.meter-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 32px rgba(76,175,80,0.18),
+             0 4px 12px rgba(102,187,106,0.12);
+}
+.meter-head{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-bottom:10px}
+.meter-ico{font-size:28px}
+.meter-name{font-weight:800}
+.meter-unit{font-size:12px;opacity:.7}
+
+.meter-row{display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center;margin:8px 0}
+.meter-label{opacity:.8}
+.meter-field{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{
+  padding:8px 14px;
+  border-radius:16px;
+  background:linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%);
+  border:1px solid rgba(76,175,80,0.3);
+  font-weight:700;
+  color:#2E7D32;
+  box-shadow:0 2px 8px rgba(76,175,80,0.15);
+  transition:all 0.3s;
+}
+.badge:hover{
+  transform:scale(1.05);
+  box-shadow:0 4px 12px rgba(76,175,80,0.25);
+}
+.badge .u{opacity:.7;margin-left:4px}
+
+.meter-input{width:180px;max-width:100%;padding:10px;border:1px solid #cfe5d0;border-radius:10px;font-weight:700;text-align:right}
+.meter-input:focus{outline:3px solid rgba(46,160,67,.22);border-color:#2d7c33}
+.meter-card.error .meter-input{border-color:#d73a49;outline:3px solid rgba(215,58,73,.18)}
+.err{color:#d73a49;font-size:12px;margin-top:4px;display:none}
+.meter-card.error .err{display:block}
+
+.meter-footer{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.pill{
+  padding:7px 12px;
+  border-radius:20px;
+  background:linear-gradient(135deg, rgba(248,252,249,0.9) 0%, rgba(232,245,233,0.7) 100%);
+  border:1.5px solid rgba(129,199,132,0.3);
+  font-weight:700;
+  color:#2E7D32;
+  box-shadow:0 2px 6px rgba(76,175,80,0.1);
+  transition:all 0.3s;
+}
+.pill:hover{
+  background:linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%);
+  transform:scale(1.05);
+}
+.pill .u{opacity:.7;margin-left:4px}
+
+/* ===== итог и отправка ===== */
+.meters-summary{
+  max-width:1040px;
+  margin:8px auto 18px;
+  padding:20px 24px;
+  display:flex;
+  gap:16px;
+  align-items:center;
+  justify-content:space-between;
+  background:linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+  border-radius:20px;
+  box-shadow:0 8px 24px rgba(46,125,50,0.1),
+             0 2px 8px rgba(76,175,80,0.08);
+  border:1px solid rgba(129,199,132,0.2);
+  position:relative;
+  overflow:hidden;
+}
+
+.meters-summary::before {
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:4px;
+  background:linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+}
+
+.summary-title{color:#2E7D32;font-weight:700}
+.summary-total{color:#2E7D32;font-weight:900;font-size:24px}
+.send-btn{background:linear-gradient(180deg,#2d7c33 0%,#25682a 100%);color:#fff;border:1px solid #2d7c33;border-radius:12px;padding:10px 16px;min-height:44px;font-weight:900;cursor:pointer}
+.send-btn:disabled{opacity:.55;cursor:not-allowed}
+.send-btn:not(:disabled):hover{filter:brightness(1.06)}
+
+/* ===== подсказка ===== */
+.meters-hint{
+  max-width:1040px;
+  margin:0 auto 18px;
+  background:linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+  border:1px solid rgba(129,199,132,0.2);
+  border-radius:18px;
+  padding:18px 20px;
+  box-shadow:0 6px 20px rgba(46,125,50,0.08),
+             0 2px 6px rgba(76,175,80,0.06);
+  position:relative;
+  overflow:hidden;
+}
+
+.meters-hint::before {
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:3px;
+  background:linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+  opacity:0.6;
+}
+.hint-title{font-weight:900;margin-bottom:6px}
+
+/* Added: draft/clear controls */
+.summary-actions{display:flex;gap:10px;align-items:center}
+.btn-ghost{
+  background:#ffffff; color:#2d7c33; border:1px solid #2d7c33;
+  border-radius:12px; padding:10px 14px; min-height:44px; font-weight:800; cursor:pointer
+}
+.btn-ghost:hover{background:#eef6ee}
+.draft-hint{margin-top:4px;color:#dfeee3;font-size:13px;opacity:.9}
+</style>
+
+<script>
+/** ====== КОНСТАНТЫ ДЛЯ ЧЕРНОВИКА ====== */
+const DRAFT_KEY = 'meters_draft_v1';   // версия ключа; при изменениях схемы повышай суффикс
+
+/** ====== ДАННЫЕ ПО УСЛУГАМ ====== */
+const METERS = [
+  { id:'el',   icon:'⚡', name:'Электроэнергия', unit:'кВт·ч', decimals:0, prev:12800, curr:null, tariff:5.96 },
+  { id:'cold', icon:'💧', name:'Холодная вода',  unit:'м³',    decimals:2, prev:257,   curr:null, tariff:20.92 },
+  { id:'hot',  icon:'🔥', name:'Горячая вода',   unit:'м³',    decimals:2, prev:195,   curr:null, tariff:44.86 },
+  { id:'gas',  icon:'🟠', name:'Газоснабжение',  unit:'м³',    decimals:2, prev:126,   curr:null, tariff:25.11 },
+];
+
+/** ====== УТИЛИТЫ ====== */
+const nbsp = String.fromCharCode(160);
+const fmtNum   = (n,d=0)=> (Number(n)).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d}).replace(/\s/g,nbsp);
+const fmtMoney = n => (Math.round(n*100)/100).toLocaleString('ru-RU').replace(/\s/g,nbsp) + nbsp + '₽';
+const clampByDecimals = (val,d)=> {
+  const s = String(val).replace(',', '.').replace(/[^\d.]/g,'');
+  if(!s) return '';
+  const [a,b] = s.split('.');
+  return d>0 && b!==undefined ? `${a}.${b.slice(0,d)}` : a;
+};
+const nowISO = ()=> new Date().toLocaleString('ru-RU');
+
+const grid = document.getElementById('metersGrid');
+const sendBtn = document.getElementById('sendBtn');
+const clearDraftBtn = document.getElementById('clearDraftBtn');
+const draftHint = document.getElementById('draftHint');
+const draftTime = document.getElementById('draftTime');
+
+/** ====== ЧЕРНОВИК (load/save/clear) ====== */
+function loadDraft(){
+  try{
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if(!raw) return;
+    const draft = JSON.parse(raw);
+    if(!draft || !Array.isArray(draft.items)) return;
+    draft.items.forEach(di=>{
+      const m = METERS.find(x=>x.id===di.id);
+      if(!m) return;
+      m.curr = (di.curr===null || di.curr==='') ? null : di.curr;
+    });
+    if(draft.updatedAt){
+      draftHint.hidden = false;
+      draftTime.textContent = draft.updatedAt;
+    }
+  }catch(e){ console.warn('Не удалось прочитать черновик', e); }
+}
+
+function saveDraft(){
+  try{
+    const items = METERS.map(m=>({id:m.id, curr:m.curr}));
+    const payload = { items, updatedAt: nowISO() };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+    draftHint.hidden = false;
+    draftTime.textContent = payload.updatedAt;
+  }catch(e){ console.warn('Не удалось сохранить черновик', e); }
+}
+
+function clearDraft(){
+  try{ localStorage.removeItem(DRAFT_KEY); }catch{}
+  draftHint.hidden = true;
+  draftTime.textContent = '';
+}
+
+/** ====== РЕНДЕР ====== */
+function cardHTML(m){
+  return `
+  <article class="meter-card" data-id="${m.id}">
+    <div class="meter-head">
+      <div class="meter-ico">${m.icon}</div>
+      <div class="meter-name">${m.name}</div>
+      <div class="meter-unit">${m.unit}</div>
+    </div>
+
+    <div class="meter-row">
+      <div class="meter-label">Предыдущее:</div>
+      <div class="meter-field"><span class="badge">${fmtNum(m.prev, m.decimals)} <span class="u">${m.unit}</span></span></div>
+    </div>
+
+    <div class="meter-row">
+      <div class="meter-label">Текущее:</div>
+      <div class="meter-field">
+        <input class="meter-input" inputmode="${m.decimals? 'decimal':'numeric'}" placeholder="Введите показание"
+               data-decimals="${m.decimals}">
+        <div class="err">Текущее не может быть меньше предыдущего</div>
+      </div>
+    </div>
+
+    <div class="meter-footer">
+      <div class="pill">Расход: <span class="use">—</span> <span class="u">${m.unit}</span></div>
+      <div class="pill">Тариф: <span>${fmtNum(m.tariff,2)}</span> <span class="u">₽/${m.unit}</span></div>
+      <div class="pill">Сумма: <span class="sum">—</span></div>
+    </div>
+  </article>`;
+}
+
+function render(){
+  grid.innerHTML = METERS.map(cardHTML).join('');
+  document.querySelectorAll('.meter-card').forEach(card=>{
+    const id = card.dataset.id;
+    const m = METERS.find(x=>x.id===id);
+    const input = card.querySelector('.meter-input');
+    if(m.curr!=null && m.curr!==''){ input.value = m.curr; }
+  });
+}
+
+/** ====== ПОДСЧЁТЫ ====== */
+function recalcCard(card, m){
+  const useEl = card.querySelector('.use');
+  const sumEl = card.querySelector('.sum');
+  if(m.curr==null || m.curr===''){
+    useEl.textContent = '—';
+    sumEl.textContent = '—';
+    return 0;
+  }
+  const use = Math.max(0, (+m.curr) - m.prev);
+  const sum = use * m.tariff;
+  useEl.textContent = fmtNum(use, m.decimals||0);
+  sumEl.textContent = fmtMoney(sum);
+  return sum;
+}
+
+function recalcTotal(){
+  const total = METERS.reduce((acc,m)=>{
+    if(m.curr==null || m.curr==='') return acc;
+    const use = Math.max(0, (+m.curr)-m.prev);
+    return acc + (use * m.tariff);
+  },0);
+  document.getElementById('summaryTotal').textContent = fmtMoney(total);
+  validateAll();
+}
+
+function validateAll(){
+  const valid = Array.from(document.querySelectorAll('.meter-card')).every(card=>{
+    const id = card.dataset.id;
+    const m = METERS.find(x=>x.id===id);
+    const invalid = (m.curr!=null && m.curr!=='') ? (+m.curr < m.prev) : false;
+    card.classList.toggle('error', invalid);
+    return !invalid;
+  });
+  sendBtn.disabled = !valid;
+}
+
+/** ====== СЛУШАТЕЛИ ====== */
+function attachHandlers(){
+  document.querySelectorAll('.meter-card').forEach(card=>{
+    const id = card.dataset.id;
+    const m = METERS.find(x=>x.id===id);
+    const input = card.querySelector('.meter-input');
+
+    input.addEventListener('input', e=>{
+      const d = +(input.dataset.decimals || 0);
+      const raw = clampByDecimals(e.target.value, d);
+      e.target.value = raw;
+      m.curr = raw;
+
+      const invalid = (raw!=='' && +raw < m.prev);
+      card.classList.toggle('error', invalid);
+
+      recalcCard(card, m);
+      recalcTotal();
+      saveDraft();
+    });
+  });
+
+  sendBtn.addEventListener('click', ()=>{
+    if(sendBtn.disabled) return;
+    const payload = METERS.map(m=>({id:m.id, prev:m.prev, curr: (m.curr===''? null : (m.curr==null? null : +m.curr))}));
+    console.log('Отправляем показания:', payload);
+    clearDraft();
+    alert('Показания отправлены (демо).');
+  });
+
+  clearDraftBtn.addEventListener('click', ()=>{
+    METERS.forEach(m=> m.curr=null);
+    render();
+    attachHandlers();
+    recalcTotal();
+    clearDraft();
+  });
+}
+
+/** ====== ИНИЦИАЛИЗАЦИЯ ====== */
+(function init(){
+  loadDraft();
+  render();
+  attachHandlers();
+  document.querySelectorAll('.meter-card').forEach(card=>{
+    const id = card.dataset.id;
+    const m = METERS.find(x=>x.id===id);
+    recalcCard(card, m);
+  });
+  recalcTotal();
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
+

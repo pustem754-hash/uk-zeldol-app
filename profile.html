@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - УК Зелёная Долина</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #DCEDC8;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1A4D2E;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header h1 { color: #2E7D32; font-size: 24px; margin-bottom: 10px; }
+        /* УВЕЛИЧЕННАЯ И ЖИРНАЯ СТРЕЛКА НАЗАД! */
+        .back-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);
+        }
+        .back-btn:hover { background: #2E7D32; transform: translateY(-2px); }
+        .profile-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            padding: 28px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        .profile-card h2 { color: #2E7D32; margin-bottom: 20px; }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            margin: 0 auto 20px;
+        }
+        .profile-info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #666; font-weight: bold; }
+        .info-value { color: #2E7D32; }
+        .contact-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .contact-icon { font-size: 24px; margin-right: 10px; }
+        .contact-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .contact-btn:hover { background: #2E7D32; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">← Назад</a>
+            <img src="/logo-original.png" alt="УК «Зелёная Долина»">
+            <h1>👤 Профиль</h1>
+        </div>
+
+        <div class="profile-card">
+            <h2>Личные данные</h2>
+            <div class="profile-avatar">👤</div>
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="info-label">ФИО:</span>
+                    <span class="info-value">Иванов Иван Иванович</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Телефон:</span>
+                    <span class="info-value">+7 960 072 03 21</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">ivan@example.com</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h2>📞 Контакты УК "Зелёная Долина"</h2>
+            
+            <div class="contact-item">
+                <span class="contact-icon">📞</span>
+                <strong>Диспетчерская служба (круглосуточно)</strong><br>
+                <a href="tel:+79600720321" class="contact-btn">☎️ 8 960 072 03 21</a>
+            </div>
+
+            <div class="contact-item">
+                <span class="contact-icon">📧</span>
+                <strong>Email для обращений</strong><br>
+                <a href="mailto:info@zelenaya-dolina.ru" class="contact-btn">✉️ info@zelenaya-dolina.ru</a>
+            </div>
+
+            <div class="contact-item">
+                <span class="contact-icon">🏢</span>
+                <strong>Офис</strong><br>
+                г. Зеленодольск, ул. Шустова, д. 4А, пом. 15
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm('Выйти из аккаунта?')) {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+

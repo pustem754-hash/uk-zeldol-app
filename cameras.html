@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видеонаблюдение - УК Зелёная Долина</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #DCEDC8;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1A4D2E;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header h1 { color: #2E7D32; font-size: 24px; margin-bottom: 10px; }
+        /* УВЕЛИЧЕННАЯ И ЖИРНАЯ СТРЕЛКА НАЗАД! */
+        .back-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s;
+        }
+        .back-btn:hover { background: #2E7D32; transform: translateY(-2px); }
+        .camera-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .camera-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        
+        .camera-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(76,175,80,0.18),
+                        0 4px 12px rgba(102,187,106,0.12);
+        }
+        .camera-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .camera-name { font-size: 20px; font-weight: bold; color: #2E7D32; }
+        .camera-status {
+            padding: 5px 15px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .camera-status.offline {
+            background: #f44336;
+        }
+        .video-container {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .video-placeholder {
+            text-align: center;
+            padding: 20px;
+        }
+        .video-placeholder img {
+            max-width: 80px;
+            opacity: 0.5;
+        }
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+        }
+        .btn:hover { background: #2E7D32; }
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .contacts-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .contact-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">← Назад</a>
+            <img src="/logo-original.png" alt="УК «Зелёная Долина»">
+            <div>
+                <h1>📹 Видеонаблюдение Dali Telecom</h1>
+                <p>Просмотр камер в реальном времени</p>
+            </div>
+        </div>
+
+        <!-- Камера 1: Подъезд 1 -->
+        <div class="camera-card">
+            <div class="camera-header">
+                <div class="camera-name">🚪 Подъезд 1</div>
+                <span class="camera-status">🟢 Онлайн</span>
+            </div>
+            <div class="video-container">
+                <div class="video-placeholder">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%234CAF50'/%3E%3Ctext x='50' y='60' text-anchor='middle' fill='white' font-size='20'%3E📹%3C/text%3E%3C/svg%3E" alt="Camera">
+                    <p>Прямой эфир</p>
+                </div>
+            </div>
+            <div class="camera-controls">
+                <button class="btn">📹 Прямой эфир</button>
+                <button class="btn btn-secondary">📂 Архив</button>
+            </div>
+        </div>
+
+        <!-- Камера 2: Двор -->
+        <div class="camera-card">
+            <div class="camera-header">
+                <div class="camera-name">🏠 Двор</div>
+                <span class="camera-status">🟢 Онлайн</span>
+            </div>
+            <div class="video-container">
+                <div class="video-placeholder">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%234CAF50'/%3E%3Ctext x='50' y='60' text-anchor='middle' fill='white' font-size='20'%3E📹%3C/text%3E%3C/svg%3E" alt="Camera">
+                    <p>Прямой эфир</p>
+                </div>
+            </div>
+            <div class="camera-controls">
+                <button class="btn">📹 Прямой эфир</button>
+                <button class="btn btn-secondary">📂 Архив</button>
+            </div>
+        </div>
+
+        <!-- Камера 3: Въезд -->
+        <div class="camera-card">
+            <div class="camera-header">
+                <div class="camera-name">🚗 Въезд</div>
+                <span class="camera-status">🟢 Онлайн</span>
+            </div>
+            <div class="video-container">
+                <div class="video-placeholder">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%234CAF50'/%3E%3Ctext x='50' y='60' text-anchor='middle' fill='white' font-size='20'%3E📹%3C/text%3E%3C/svg%3E" alt="Camera">
+                    <p>Прямой эфир</p>
+                </div>
+            </div>
+            <div class="camera-controls">
+                <button class="btn">📹 Прямой эфир</button>
+                <button class="btn btn-secondary">📂 Архив</button>
+            </div>
+        </div>
+
+        <!-- Камера 4: Детская площадка -->
+        <div class="camera-card">
+            <div class="camera-header">
+                <div class="camera-name">🎠 Детская площадка</div>
+                <span class="camera-status">🟢 Онлайн</span>
+            </div>
+            <div class="video-container">
+                <div class="video-placeholder">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%234CAF50'/%3E%3Ctext x='50' y='60' text-anchor='middle' fill='white' font-size='20'%3E📹%3C/text%3E%3C/svg%3E" alt="Camera">
+                    <p>Прямой эфир</p>
+                </div>
+            </div>
+            <div class="camera-controls">
+                <button class="btn">📹 Прямой эфир</button>
+                <button class="btn btn-secondary">📂 Архив</button>
+            </div>
+        </div>
+
+        <!-- Контакты УК -->
+        <div class="contacts-card">
+            <h3 style="color: #2E7D32; margin-bottom: 15px;">📞 Контакты УК</h3>
+            <div class="contact-item">
+                <strong>📞 Диспетчер (круглосуточно):</strong><br>
+                <a href="tel:+79600720321" style="color: #4CAF50; font-weight: bold;">8 960 072 03 21</a>
+            </div>
+            <div class="contact-item">
+                <strong>📧 Email:</strong><br>
+                <a href="mailto:info@zelenaya-dolina.ru" style="color: #4CAF50; font-weight: bold;">info@zelenaya-dolina.ru</a>
+            </div>
+            <div class="contact-item">
+                <strong>🏢 Адрес:</strong><br>
+                г. Зеленодольск, ул. Шустова, д. 4А, пом. 15
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция для открытия видео в полноэкранном режиме
+        function openFullscreen(cameraName) {
+            alert('🎥 Открытие видеопотока: ' + cameraName + '\n\nВ рабочей версии здесь будет реальное видео.');
+        }
+
+        // Функция для доступа к архиву
+        function openArchive(cameraName) {
+            alert('📂 Архив видеозаписей: ' + cameraName + '\n\nВ рабочей версии здесь будет доступ к архиву.');
+        }
+
+        // Обработчики кнопок
+        document.querySelectorAll('.btn').forEach((btn, index) => {
+            btn.addEventListener('click', function() {
+                const cameraNames = ['Подъезд 1', 'Двор', 'Въезд', 'Детская площадка'];
+                const cameraName = cameraNames[Math.floor(index / 2)];
+                
+                if (this.textContent.includes('Прямой эфир')) {
+                    openFullscreen(cameraName);
+                } else if (this.textContent.includes('Архив')) {
+                    openArchive(cameraName);
+                }
+            });
+        });
+
+        // Имитация обновления статуса камер
+        setInterval(() => {
+            document.querySelectorAll('.camera-status').forEach(status => {
+                if (Math.random() > 0.99) {
+                    status.classList.toggle('offline');
+                    status.textContent = status.classList.contains('offline') ? '🔴 Офлайн' : '🟢 Онлайн';
+                }
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уведомления - ЖК Зелёная Долина</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #DCEDC8;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1A4D2E;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        .header img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+        h1 { color: #2E7D32; }
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-tab {
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+        }
+        .filter-tab.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .notification-list {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification-list::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        
+        .notification-item {
+            padding: 18px;
+            border-bottom: 1px solid rgba(129,199,132,0.15);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+        }
+        
+        .notification-item:hover {
+            background: linear-gradient(135deg, rgba(248,252,249,0.8) 0%, rgba(232,245,233,0.6) 100%);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(76,175,80,0.1);
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .notification-item.unread {
+            background: linear-gradient(135deg, rgba(232,245,233,0.6) 0%, rgba(200,230,201,0.4) 100%);
+            font-weight: 600;
+            border-left: 4px solid #4CAF50;
+            padding-left: 14px;
+        }
+        .notification-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        .notification-date {
+            color: #999;
+            font-size: 12px;
+        }
+        .notification-title {
+            color: #333;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .notification-text {
+            color: #666;
+            font-size: 14px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="/logo-original.png" alt="УК «Зелёная Долина»">
+            <h1 style="margin:0">📢 Уведомления</h1>
+            <button onclick="markAllRead()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                Отметить все как прочитанное
+            </button>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active">Все</button>
+            <button class="filter-tab">Платежи</button>
+            <button class="filter-tab">Заявки</button>
+            <button class="filter-tab">Объявления</button>
+        </div>
+
+        <div class="notification-list">
+            <div class="notification-item unread">
+                <span class="notification-icon">🔔</span>
+                <div style="display: inline-block;">
+                    <div class="notification-date">28.10.2025 14:23</div>
+                    <div class="notification-title">Новое начисление за октябрь 2025</div>
+                    <div class="notification-text">Выставлена квитанция на сумму 5,432 ₽</div>
+                </div>
+            </div>
+
+            <div class="notification-item unread">
+                <span class="notification-icon">🔧</span>
+                <div style="display: inline-block;">
+                    <div class="notification-date">27.10.2025 10:15</div>
+                    <div class="notification-title">Ваша заявка №1234 принята в работу</div>
+                    <div class="notification-text">Мастер выедет 29.10.2025 в 10:00</div>
+                </div>
+            </div>
+
+            <div class="notification-item">
+                <span class="notification-icon">⚠️</span>
+                <div style="display: inline-block;">
+                    <div class="notification-date">26.10.2025 18:00</div>
+                    <div class="notification-title">Плановое отключение воды</div>
+                    <div class="notification-text">29 октября с 9:00 до 12:00</div>
+                </div>
+            </div>
+
+            <div class="notification-item">
+                <span class="notification-icon">💳</span>
+                <div style="display: inline-block;">
+                    <div class="notification-date">25.10.2025 09:30</div>
+                    <div class="notification-title">Оплата принята</div>
+                    <div class="notification-text">Платёж на сумму 5,432 ₽ успешно проведён</div>
+                </div>
+            </div>
+
+            <div class="notification-item">
+                <span class="notification-icon">🏗️</span>
+                <div style="display: inline-block;">
+                    <div class="notification-date">20.10.2025 12:00</div>
+                    <div class="notification-title">Благоустройство территории</div>
+                    <div class="notification-text">Начались работы по обновлению детской площадки</div>
+                </div>
+            </div>
+
+            <div class="notification-item">
+                <span class="notification-icon">📅</span>
+                <div style="display: inline-block;">
+                    <div class="notification-date">15.10.2025 10:00</div>
+                    <div class="notification-title">Напоминание о передаче показаний</div>
+                    <div class="notification-text">Не забудьте передать показания счётчиков до 25 числа</div>
+                </div>
+            </div>
+        </div>
+
+        <a href="dashboard.html" class="back-link">← Назад в личный кабинет</a>
+    </div>
+
+    <script>
+        function markAllRead() {
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+            });
+            alert('✅ Все уведомления отмечены как прочитанные');
+        }
+    </script>
+</body>
+</html>
+
+
+
+

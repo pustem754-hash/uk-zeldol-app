@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление шлагбаумом - УК Зелёная Долина</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #DCEDC8;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #1A4D2E;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        
+        .logo-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        .logo-header img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+        .logo-header h1 {
+            color: #2E7D32;
+            font-size: 20px;
+            margin: 0;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);
+        }
+        
+        /* ВЫБОР ЖК И ШЛАГБАУМА */
+        .selection-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .selection-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        .selection-row {
+            margin-bottom: 15px;
+        }
+        .selection-row label {
+            display: block;
+            color: #2E7D32;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .selection-row select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+            color: #333;
+        }
+        
+        /* НАВИГАЦИЯ */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            color: #2E7D32;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-tab.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .nav-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* КАРТОЧКА КОНТРОЛЯ */
+        .control-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .status-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .status-large {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .status-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2E7D32;
+        }
+        
+        .timer-display {
+            text-align: center;
+            font-size: 64px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 20px 0;
+        }
+        
+        .btn-open {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .btn-open:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .btn-open:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* ПАРКОВКА */
+        .parking-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .parking-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .parking-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .parking-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        /* ГОСТЕВОЙ ДОСТУП */
+        .guest-form {
+            margin-bottom: 20px;
+        }
+        .guest-form input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .qr-code {
+            text-align: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .qr-code canvas {
+            max-width: 250px;
+            border: 5px solid white;
+        }
+        
+        /* ЖУРНАЛ */
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .log-table thead {
+            background: #f5f5f5;
+        }
+        .log-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            color: #666;
+        }
+        .log-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        .log-entry.success {
+            color: #4CAF50;
+        }
+        .log-entry.error {
+            color: #f44336;
+        }
+        
+        /* СКРЫТЫЕ ПАНЕЛИ */
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-header">
+            <img src="/logo-original.png" alt="УК «Зелёная Долина»">
+            <h1>Управление шлагбаумом</h1>
+        </div>
+        <a href="dashboard.html" class="back-btn">← Назад</a>
+        
+        <!-- ВЫБОР ЖК И ШЛАГБАУМА -->
+        <div class="selection-card">
+            <div class="selection-row">
+                <label>🏢 Жилой комплекс</label>
+                <select id="complexSelect" onchange="updateGates()">
+                    <option value="zel-dol">Мкр. Зелёная Долина</option>
+                    <option value="mayak">ЖК "Маяк"</option>
+                </select>
+            </div>
+            <div class="selection-row">
+                <label>🚧 Шлагбаум</label>
+                <select id="gateSelect">
+                    <option value="main">Главный въезд в ЖК</option>
+                    <option value="parking">Въезд на парковку</option>
+                    <option value="house">Подъезд к дому №3</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- НАВИГАЦИЯ -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('control')">🚧 Контроль</button>
+            <button class="nav-tab" onclick="showTab('parking')">🅿️ Парковка</button>
+            <button class="nav-tab" onclick="showTab('guest')">👥 Гости</button>
+            <button class="nav-tab" onclick="showTab('log')">📋 Журнал</button>
+        </div>
+        
+        <!-- ПАНЕЛЬ: КОНТРОЛЬ -->
+        <div id="control-panel" class="tab-panel active">
+            <div class="control-card">
+                <div class="status-header">
+                    <div class="status-large" id="status-icon">🔒</div>
+                    <div class="status-text" id="status-text">Шлагбаум закрыт</div>
+                </div>
+                
+                <div id="timer-display" class="timer-display" style="display:none;"></div>
+                
+                <div class="parking-info">
+                    <div class="parking-item">
+                        <div class="parking-value" id="parking-free">12</div>
+                        <div class="parking-label">Свободно</div>
+                    </div>
+                    <div class="parking-item">
+                        <div class="parking-value" style="color: #f44336;" id="parking-occupied">8</div>
+                        <div class="parking-label">Занято</div>
+                    </div>
+                </div>
+                
+                <button class="btn-open" onclick="openGate()" id="open-btn">
+                    🚧 ОТКРЫТЬ ШЛАГБАУМ
+                </button>
+                
+                <div style="margin-top: 15px; text-align: center; color: #666; font-size: 14px;">
+                    <p>⚡ Автоматическое закрытие через 30 секунд</p>
+                    <p>📹 Видеонаблюдение PalGate активно</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ПАНЕЛЬ: ПАРКОВКА -->
+        <div id="parking-panel" class="tab-panel">
+            <div class="control-card">
+                <h2 style="color: #2E7D32; margin-bottom: 20px;">🅿️ Статус парковки</h2>
+                
+                <div class="parking-info">
+                    <div class="parking-item">
+                        <div class="parking-value" style="color: #4CAF50;">12</div>
+                        <div class="parking-label">Свободно</div>
+                    </div>
+                    <div class="parking-item">
+                        <div class="parking-value" style="color: #f44336;">8</div>
+                        <div class="parking-label">Занято</div>
+                    </div>
+                    <div class="parking-item">
+                        <div class="parking-value" style="color: #FF9800;">3</div>
+                        <div class="parking-label">Бронировано</div>
+                    </div>
+                    <div class="parking-item">
+                        <div class="parking-value" style="color: #666;">23</div>
+                        <div class="parking-label">Всего мест</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #E8F5E9; border-radius: 10px;">
+                    <strong style="color: #2E7D32;">📍 Ваше место:</strong> A-05
+                </div>
+            </div>
+        </div>
+        
+        <!-- ПАНЕЛЬ: ГОСТЕВОЙ ДОСТУП -->
+        <div id="guest-panel" class="tab-panel">
+            <div class="control-card">
+                <h2 style="color: #2E7D32; margin-bottom: 20px;">👥 Гостевой доступ</h2>
+                
+                <div class="guest-form">
+                    <input type="text" id="guest-name" placeholder="Имя гостя" />
+                    <input type="datetime-local" id="guest-time" />
+                    <button onclick="generateQR()" class="btn-open" style="margin-top: 10px;">
+                        📱 Сгенерировать QR-код
+                    </button>
+                </div>
+                
+                <div id="qr-container" style="display:none;" class="qr-code">
+                    <h3 style="color: #2E7D32; margin-bottom: 10px;">QR-код доступа</h3>
+                    <canvas id="qr-canvas"></canvas>
+                    <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                        👆 Покажите этот код гостю на въезде
+                    </p>
+                    <button onclick="downloadQR()" style="margin-top: 10px; padding: 10px 20px; background: #f5f5f5; border: none; border-radius: 8px; cursor: pointer;">
+                        💾 Скачать
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #FFF3E0; border-radius: 10px; font-size: 14px;">
+                    <strong>⚠️ Важно:</strong> QR-код действителен только в указанное время. Не передавайте код третьим лицам.
+                </div>
+            </div>
+        </div>
+        
+        <!-- ПАНЕЛЬ: ЖУРНАЛ -->
+        <div id="log-panel" class="tab-panel">
+            <div class="control-card">
+                <h2 style="color: #2E7D32; margin-bottom: 20px;">📋 Журнал операций</h2>
+                
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Шлагбаум</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>27.01.2025 15:32</td>
+                            <td>Главный въезд</td>
+                            <td class="log-entry success">✅ Открыт</td>
+                        </tr>
+                        <tr>
+                            <td>27.01.2025 14:18</td>
+                            <td>Парковка</td>
+                            <td class="log-entry success">✅ Открыт</td>
+                        </tr>
+                        <tr>
+                            <td>27.01.2025 09:45</td>
+                            <td>Подъезд к дому №3</td>
+                            <td class="log-entry success">✅ Открыт</td>
+                        </tr>
+                        <tr>
+                            <td>26.01.2025 20:12</td>
+                            <td>Главный въезд</td>
+                            <td class="log-entry success">✅ Открыт</td>
+                        </tr>
+                        <tr>
+                            <td>26.01.2025 18:05</td>
+                            <td>Парковка</td>
+                            <td class="log-entry error">❌ Ошибка связи</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let timerInterval;
+        let isOpening = false;
+        
+        function updateGates() {
+            const complex = document.getElementById('complexSelect').value;
+            const gateSelect = document.getElementById('gateSelect');
+            
+            if (complex === 'zel-dol') {
+                gateSelect.innerHTML = `
+                    <option value="main">Главный въезд в ЖК "Зелёная Долина"</option>
+                    <option value="parking">Въезд на парковку</option>
+                    <option value="house1">Подъезд к дому №1</option>
+                    <option value="house3">Подъезд к дому №3</option>
+                    <option value="house5">Подъезд к дому №5</option>
+                    <option value="house7">Подъезд к дому №7</option>
+                `;
+            } else {
+                gateSelect.innerHTML = `
+                    <option value="main">Главный въезд в ЖК "Маяк"</option>
+                    <option value="parking">Въезд на парковку</option>
+                    <option value="house25-1">Подъезд к дому №25/1</option>
+                    <option value="house25-2">Подъезд к дому №25/2</option>
+                `;
+            }
+        }
+        
+        function showTab(tabName) {
+            // Скрыть все панели
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Убрать активный класс со всех кнопок
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показать выбранную панель
+            document.getElementById(tabName + '-panel').classList.add('active');
+            
+            // Добавить активный класс к кнопке
+            event.target.classList.add('active');
+            
+            // Если открыт таймер, остановить
+            if (isOpening) {
+                clearInterval(timerInterval);
+                isOpening = false;
+                document.getElementById('timer-display').style.display = 'none';
+                document.getElementById('status-icon').textContent = '🔒';
+                document.getElementById('status-text').textContent = 'Шлагбаум закрыт';
+                document.getElementById('open-btn').disabled = false;
+            }
+        }
+        
+        function openGate() {
+            if (isOpening) return;
+            
+            const confirmOpen = confirm('🚧 Открыть шлагбаум?');
+            if (!confirmOpen) return;
+            
+            isOpening = true;
+            const statusIcon = document.getElementById('status-icon');
+            const statusText = document.getElementById('status-text');
+            const timerDisplay = document.getElementById('timer-display');
+            const openBtn = document.getElementById('open-btn');
+            
+            // 1. Статус: Открываю...
+            statusIcon.textContent = '⏳';
+            statusText.textContent = 'Открываю шлагбаум...';
+            statusText.style.color = '#FF9800';
+            
+            setTimeout(() => {
+                // 2. Статус: Открыт!
+                statusIcon.textContent = '✅';
+                statusText.textContent = 'Шлагбаум открыт!';
+                statusText.style.color = '#4CAF50';
+                timerDisplay.style.display = 'block';
+                openBtn.disabled = true;
+                
+                // 3. Таймер обратного отсчёта
+                let seconds = 30;
+                timerDisplay.textContent = seconds + ' сек';
+                
+                timerInterval = setInterval(() => {
+                    seconds--;
+                    timerDisplay.textContent = seconds + ' сек';
+                    
+                    if (seconds === 0) {
+                        clearInterval(timerInterval);
+                        statusIcon.textContent = '🔒';
+                        statusText.textContent = 'Шлагбаум закрыт';
+                        statusText.style.color = '#666';
+                        timerDisplay.style.display = 'none';
+                        openBtn.disabled = false;
+                        isOpening = false;
+                        
+                        // Добавить в журнал
+                        addLogEntry();
+                    }
+                }, 1000);
+            }, 1000);
+        }
+        
+        function addLogEntry() {
+            const tbody = document.querySelector('.log-table tbody');
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ru') + ' ' + now.toLocaleTimeString('ru', {hour: '2-digit', minute: '2-digit'});
+            
+            const gateSelect = document.getElementById('gateSelect');
+            const gateName = gateSelect.options[gateSelect.selectedIndex].text;
+            
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${dateStr}</td>
+                <td>${gateName}</td>
+                <td class="log-entry success">✅ Открыт</td>
+            `;
+            
+            tbody.insertBefore(newRow, tbody.firstChild);
+        }
+        
+        function generateQR() {
+            const guestName = document.getElementById('guest-name').value;
+            const guestTime = document.getElementById('guest-time').value;
+            
+            if (!guestName || !guestTime) {
+                alert('⚠️ Заполните все поля!');
+                return;
+            }
+            
+            document.getElementById('qr-container').style.display = 'block';
+            
+            // Генерация простого QR-кода (заглушка)
+            const canvas = document.getElementById('qr-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 250;
+            canvas.height = 250;
+            
+            // Рисуем простой QR (заглушка)
+            ctx.fillStyle = '#000';
+            ctx.fillRect(50, 50, 150, 150);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(80, 80, 90, 90);
+            
+            // Информация
+            ctx.fillStyle = '#000';
+            ctx.font = '12px Arial';
+            ctx.fillText(guestName, 60, 220);
+        }
+        
+        function downloadQR() {
+            alert('💾 QR-код сохранён в галерею');
+        }
+        
+        // Обновление статистики парковки (имитация в реальном времени)
+        setInterval(() => {
+            const free = Math.floor(Math.random() * 5) + 10;
+            const occupied = 23 - free;
+            document.getElementById('parking-free').textContent = free;
+            document.getElementById('parking-occupied').textContent = occupied;
+        }, 10000);
+    </script>
+</body>
+</html>
+
+
+
+
+
+

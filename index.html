@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4CAF50">
+  <title>ЖК «Зелёная Долина» — Вход</title>
+  <style>
+    :root{
+      --green:#2d7c33;--green-dark:#25682a;--bg1:#165c2d;--bg2:#125026;
+      --card:rgba(255,255,255,.95);--border:rgba(0,0,0,.08);
+      --text:#1f2937;--muted:#6b7280;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      min-height:100svh; display:grid; place-items:center;
+      background:#DCEDC8;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+      color:var(--text);
+    }
+    .logo-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .logo-header img {
+      height: 50px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    .container{width:min(440px,92vw)}
+    .card{
+      background:linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+      border:1px solid rgba(129,199,132,0.25);
+      border-radius:24px;
+      box-shadow:0 12px 40px rgba(46,125,50,0.15),
+                 0 4px 12px rgba(76,175,80,0.1);
+      padding:32px 28px;
+      transform:translateY(0);
+      animation:pop .18s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .card::before {
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:5px;
+      background:linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+    }
+    @keyframes pop{from{opacity:.4; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
+    h1{margin:0 0 6px; font-weight:900; font-size:22px; color:var(--green)}
+    .subtitle{margin:0 0 16px; color:var(--muted)}
+    label{display:block; font-weight:700; margin:12px 0 6px}
+    input{
+      width:100%; padding:12px 12px; border-radius:12px; border:1px solid #cfe5d0;
+      font-size:16px; outline:none; transition:border-color .15s, box-shadow .15s;
+      background:#fff;
+    }
+    input:focus{border-color:var(--green); box-shadow:0 0 0 3px rgba(45,124,51,.18)}
+    .row{display:flex; gap:10px; align-items:center}
+    .btn{
+      width:100%; padding:12px 16px; border-radius:12px; border:1px solid var(--green);
+      background:linear-gradient(180deg,var(--green) 0%, var(--green-dark) 100%);
+      color:#fff; font-weight:900; cursor:pointer; transition:filter .15s, transform .05s;
+    }
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .btn:not(:disabled):hover{filter:brightness(1.06)}
+    .btn-ghost{
+      width:auto; padding:10px 12px; border-radius:10px; border:1px solid var(--green);
+      background:#fff; color:var(--green); font-weight:800; cursor:pointer;
+    }
+    .hint{margin-top:10px; color:var(--muted); font-size:14px}
+    .code-area{max-height:0; overflow:hidden; transition:max-height .22s ease}
+    .code-area.open{max-height:160px}
+    .code-grid{display:flex; gap:8px}
+    .code-input{letter-spacing:.3em; text-align:center; font-weight:800}
+    .footer{margin-top:14px; display:flex; justify-content:space-between; align-items:center}
+    /* тост */
+    .toast{
+      position:fixed; right:16px; top:16px; z-index:9999;
+      background:#fff; color:var(--text); border:1px solid #cfe5d0; border-left:6px solid var(--green);
+      border-radius:12px; padding:10px 12px; box-shadow:0 8px 24px rgba(0,0,0,.18);
+      animation:toast-in .18s ease;
+    }
+    @keyframes toast-in{from{opacity:.3; transform:translateY(-8px)} to{opacity:1; transform:none}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="card">
+      <div class="logo-header">
+        <img src="/logo-original.png" alt="ЖК «Зелёная Долина»">
+        <h1 style="margin:0">ЖК «Зелёная Долина»</h1>
+      </div>
+      <p class="subtitle">Войдите по номеру телефона</p>
+
+      <!-- Шаг 1: телефон -->
+      <label for="phone">Номер телефона</label>
+      <input id="phone" type="tel" placeholder="+7 (___) ___-__-__" autocomplete="tel" inputmode="tel"/>
+
+      <button id="getCode" class="btn" style="margin-top:12px">Получить код</button>
+      <div class="hint">Мы отправим одноразовый код в SMS на указанный номер</div>
+
+      <!-- Шаг 2: код -->
+      <div id="codeArea" class="code-area">
+        <label for="code">Код подтверждения</label>
+        <div class="row">
+          <input id="code" class="code-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••••" />
+          <button id="resend" class="btn-ghost" type="button" title="Отправить код ещё раз">Отправить снова</button>
+        </div>
+        <button id="enter" class="btn" style="margin-top:12px" disabled>Войти</button>
+      </div>
+
+      <div class="footer">
+        <button id="devToggle" class="btn-ghost" type="button">Режим разработчика: вкл</button>
+        <span class="hint" id="statusText">Ожидание номера</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Настройки =====
+    const DEV_DEFAULTS = { phone: "+7 (999) 123-45-67", code: "000000" };
+    let isDevMode = true; // выключишь позже, когда всё доделаем
+
+    // ===== Элементы =====
+    const phone = document.getElementById('phone');
+    const getCode = document.getElementById('getCode');
+    const codeArea = document.getElementById('codeArea');
+    const codeInput = document.getElementById('code');
+    const resend = document.getElementById('resend');
+    const enterBtn = document.getElementById('enter');
+    const statusText = document.getElementById('statusText');
+    const devToggle = document.getElementById('devToggle');
+
+    // Если уже авторизован — на дашборд
+    if (localStorage.getItem('zd_auth') === '1') {
+      window.location.replace('dashboard.html');
+    }
+
+    // Маска телефона (простая)
+    phone.addEventListener('input', () => {
+      let v = phone.value.replace(/\D/g, '');
+      if (v.startsWith('8')) v = '7' + v.slice(1);
+      if (!v.startsWith('7')) v = '7' + v;
+      const p = v.padEnd(11, '_').slice(0, 11).split('');
+      phone.value = `+${p[0]} (${p[1]}${p[2]}${p[3]}) ${p[4]}${p[5]}${p[6]}-${p[7]}${p[8]}-${p[9]}${p[10]}`;
+      const isComplete = v.length === 11;
+      statusText.textContent = isComplete ? 'Нажмите «Получить код»' : 'Введите номер';
+      getCode.disabled = !isComplete;
+    });
+
+    // Получить код (шаг 2)
+    getCode.addEventListener('click', () => {
+      codeArea.classList.add('open');
+      statusText.textContent = 'Код отправлен';
+      showToast('Код отправлен на ваш номер');
+      codeInput.focus();
+
+      // автозаполнение в dev-режиме
+      if (isDevMode) {
+        setTimeout(() => { codeInput.value = DEV_DEFAULTS.code; validateCode(); }, 300);
+      }
+    });
+
+    // Ввод кода
+    codeInput.addEventListener('input', validateCode);
+    function validateCode() {
+      // принимаем только цифры, максимум 6
+      codeInput.value = codeInput.value.replace(/\D/g, '').slice(0,6);
+      enterBtn.disabled = codeInput.value.length < 4; // можно 4–6
+    }
+
+    // Отправить снова
+    resend.addEventListener('click', () => {
+      showToast('Код отправлен повторно');
+      if (isDevMode) {
+        codeInput.value = DEV_DEFAULTS.code;
+        validateCode();
+      }
+    });
+
+    // Войти
+    enterBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // в реале здесь проверка кода на сервере
+      localStorage.setItem('zd_auth', '1');          // флаг авторизации
+      localStorage.setItem('zd_phone', phone.value); // чтобы показывать на дашборде
+      showToast('Вход выполнен');
+      setTimeout(()=> window.location.href = 'dashboard.html', 400);
+    });
+
+    // Тост
+    function showToast(text){
+      const t = document.createElement('div');
+      t.className = 'toast'; t.textContent = text;
+      document.body.appendChild(t);
+      setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(-6px)'; }, 1800);
+      setTimeout(()=> t.remove(), 2050);
+    }
+
+    // Dev toggle
+    devToggle.addEventListener('click', ()=>{
+      isDevMode = !isDevMode;
+      devToggle.textContent = `Режим разработчика: ${isDevMode ? 'вкл' : 'выкл'}`;
+      if (isDevMode) {
+        phone.value = DEV_DEFAULTS.phone;
+        statusText.textContent = 'Нажмите «Получить код»';
+        getCode.disabled = false;
+      } else {
+        phone.value = '';
+        statusText.textContent = 'Ожидание номера';
+        getCode.disabled = true;
+        codeInput.value = ''; validateCode();
+        codeArea.classList.remove('open');
+      }
+    });
+
+    // Автозапуск в dev-режиме для быстрого теста
+    window.addEventListener('DOMContentLoaded', () => {
+      if (isDevMode) {
+        phone.value = DEV_DEFAULTS.phone;
+        getCode.disabled = false;
+        setTimeout(()=> getCode.click(), 500);
+        setTimeout(()=> enterBtn.click(), 1200);
+      }
+    });
+  </script>
+</body>
+</html>

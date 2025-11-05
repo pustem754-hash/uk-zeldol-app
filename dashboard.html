@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ru" data-complex="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8BC34A">
+    <title>Панель управления - УК Зелёная Долина</title>
+    <link rel="stylesheet" href="/design-system.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: #DCEDC8;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: var(--spacing-md);
+            animation: fadeSlide 0.3s ease-out;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--surface-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-strong);
+            border: 1.5px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--primary-soft-green) 0%, 
+                var(--primary-accent) 100%);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header-left img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header-left h1 {
+            color: var(--text-primary);
+            font-size: 28px;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 5px;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        
+        .complex-selector {
+            margin-top: var(--spacing-sm);
+            padding: 6px 12px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            background: var(--surface-white);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .complex-selector:hover {
+            border-color: var(--primary-accent);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .complex-selector:focus {
+            outline: 2px solid var(--primary-accent);
+            outline-offset: 2px;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: var(--font-weight-medium);
+            margin-top: 4px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary-soft-green) 0%, var(--primary-accent) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: var(--shadow-colored);
+            transition: all var(--transition-base);
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .user-details h3 {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: var(--font-weight-normal);
+        }
+
+        /* КАРТОЧКА "МОИ КВАРТИРЫ" - КРЕАТИВНЫЙ ДИЗАЙН */
+        .apartments-card {
+            background: var(--surface-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-strong);
+            border: 1.5px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .apartments-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+
+        .apartments-card h2 {
+            color: var(--text-primary);
+            font-size: 22px;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .apartment-item {
+            background: var(--surface-tinted);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-md);
+            border-left: 4px solid var(--primary-soft-green);
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-soft);
+            border: 1.5px solid var(--border-light);
+            border-left-width: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .apartment-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(129,199,132,0.05) 0%, rgba(102,187,106,0.03) 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .apartment-item:hover {
+            transform: translateY(-4px) translateX(5px);
+            box-shadow: 0 12px 28px rgba(76,175,80,0.2),
+                        0 4px 12px rgba(102,187,106,0.15);
+            border-left-width: 6px;
+        }
+        
+        .apartment-item:hover::before {
+            opacity: 1;
+        }
+
+        .apartment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .apartment-title {
+            font-size: 18px;
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .apartment-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%);
+            color: #2E7D32;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.15);
+            border: 1px solid rgba(76,175,80,0.2);
+        }
+
+        .apartment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: var(--font-weight-normal);
+        }
+
+        .detail-icon {
+            font-size: 18px;
+        }
+
+        .detail-label {
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        .utilities-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+        }
+
+        .utility-tag {
+            padding: 6px 14px;
+            background: var(--surface-white);
+            border: 1.5px solid var(--border-medium);
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: var(--font-weight-semibold);
+            box-shadow: var(--shadow-soft);
+            transition: all var(--transition-fast);
+        }
+        
+        .utility-tag:hover {
+            background: var(--border-light);
+            border-color: var(--primary-soft-green);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-medium);
+            color: var(--text-primary);
+        }
+
+        /* ГЛАВНОЕ МЕНЮ */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .menu-item {
+            background: var(--surface-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            text-decoration: none;
+            color: inherit;
+            transition: all var(--transition-base);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-item::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(129,199,132,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--primary-soft-green) 0%, 
+                var(--primary-accent) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-elevated);
+            border-color: var(--primary-accent);
+        }
+        
+        .menu-item:hover::before {
+            opacity: 1;
+        }
+        
+        .menu-item:hover::after {
+            opacity: 1;
+        }
+
+        .menu-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .menu-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .menu-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 10px;
+            box-shadow: 0 2px 8px rgba(244,67,54,0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* БЫСТРЫЕ ДЕЙСТВИЯ */
+        .quick-actions {
+            background: var(--surface-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-strong);
+            border: 1.5px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quick-actions::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+
+        .quick-actions h2 {
+            color: var(--text-primary);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-lg);
+            font-size: 20px;
+            letter-spacing: -0.01em;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--primary-soft-green) 0%, var(--primary-accent) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            box-shadow: var(--shadow-colored);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-strong);
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ШАПКА -->
+        <div class="header">
+            <div class="header-left">
+                <img src="/logo-original.png" alt="УК «Зелёная Долина»">
+                <div>
+                    <h1>УК "<span class="complex-name">Зелёная Долина</span>"</h1>
+                    <p>Личный кабинет жильца</p>
+                    <select id="complexSelector" class="complex-selector" aria-label="Выбор комплекса">
+                        <option value="default">Зелёная Долина</option>
+                        <option value="northern">Северный</option>
+                        <option value="southern">Южный</option>
+                    </select>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">👤</div>
+                <div class="user-details">
+                    <h3>Иванов И.И.</h3>
+                    <p>Кв. 15</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- КАРТОЧКА "МОИ КВАРТИРЫ" -->
+        <section class="units">
+          <h3 class="units-title">Мои квартиры</h3>
+          <div class="units-list" id="unitsList"></div>
+        </section>
+
+        <style>
+        .units-title{margin:0 0 10px;font-size:18px;font-weight:700}
+        .units-list{display:grid;grid-template-columns:1fr;gap:14px}
+        .unit-card{
+          background: var(--surface-white);
+          border: 1.5px solid var(--border-light);
+          border-radius: var(--radius-xl);
+          padding: var(--spacing-lg);
+          box-shadow: var(--shadow-medium);
+          transition: all var(--transition-base);
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .unit-card::before {
+          content:'';
+          position:absolute;
+          top:0;
+          left:0;
+          right:0;
+          height:4px;
+          background:linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        
+        .unit-card:hover{
+          transform:translateY(-4px);
+          box-shadow:0 12px 32px rgba(76,175,80,0.18),
+                     0 4px 12px rgba(102,187,106,0.12);
+        }
+        .unit-header{display:grid;grid-template-columns:1fr auto;align-items:center;margin-bottom:8px;gap:8px}
+        .unit-name{font-weight:700;font-size:16px;line-height:1.2}
+        .unit-badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;background:#2d7c33}
+        .unit-badge.alt{background:#f2994a}
+        .unit-badge.primary{background:#2d7c33}
+        .unit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin-bottom:10px}
+        .unit-item{display:grid;grid-template-columns:130px 1fr;gap:6px;align-items:center}
+        .k{opacity:.75}
+        .v{font-weight:600}
+        .clamp-2{display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
+        .unit-services{display:flex;flex-wrap:wrap;gap:6px;padding-top:6px;border-top:1px dashed rgba(0,0,0,.08)}
+        .chip{
+          padding: 7px 12px;
+          border-radius: var(--radius-full);
+          background: var(--surface-white);
+          color: var(--text-primary);
+          font-weight: var(--font-weight-semibold);
+          font-size: 12px;
+          border: 1.5px solid var(--border-medium);
+          box-shadow: var(--shadow-soft);
+          transition: all var(--transition-fast);
+        }
+        .chip:hover{
+          transform: scale(1.05);
+          box-shadow: var(--shadow-medium);
+          border-color: var(--primary-soft-green);
+          background: var(--border-light);
+        }
+        .chip.off{opacity:.6}
+        @media(min-width:900px){.units-list{grid-template-columns:1fr 1fr}}
+        @media(max-width:640px){.unit-item{grid-template-columns:120px 1fr}.unit-name{font-size:15px}}
+        </style>
+
+        <!-- ГЛАВНОЕ МЕНЮ -->
+        <div class="menu-grid">
+            <a href="payments.html" class="menu-item">
+                <div class="menu-icon">💳</div>
+                <div class="menu-title">
+                    Платежи
+                    <span class="menu-badge">2</span>
+                </div>
+                <div class="menu-description">Квитанции и оплата услуг</div>
+            </a>
+
+            <a href="payment-tracking.html" class="menu-item">
+                <div class="menu-icon">📊</div>
+                <div class="menu-title">
+                    Отслеживание
+                    <span class="menu-badge" style="background: #f44336;">2</span>
+                </div>
+                <div class="menu-description">Детализация и напоминания</div>
+            </a>
+
+            <a href="meters.html" class="menu-item">
+                <div class="menu-icon">🔋</div>
+                <div class="menu-title">Счётчики</div>
+                <div class="menu-description">Передать показания</div>
+            </a>
+
+            <a href="requests.html" class="menu-item">
+                <div class="menu-icon">🔧</div>
+                <div class="menu-title">
+                    Заявки
+                    <span class="menu-badge" style="background: #FF9800;">1</span>
+                </div>
+                <div class="menu-description">Ремонт и обслуживание</div>
+            </a>
+
+            <a href="cameras.html" class="menu-item">
+                <div class="menu-icon">📹</div>
+                <div class="menu-title">Видеонаблюдение</div>
+                <div class="menu-description">Камеры Dali Telecom</div>
+            </a>
+
+            <a href="access.html" class="menu-item">
+                <div class="menu-icon">🚧</div>
+                <div class="menu-title">Шлагбаум</div>
+                <div class="menu-description">Управление PalGate</div>
+            </a>
+
+            <a href="profile.html" class="menu-item">
+                <div class="menu-icon">👤</div>
+                <div class="menu-title">Профиль</div>
+                <div class="menu-description">Настройки и контакты</div>
+            </a>
+        </div>
+
+        <!-- БЫСТРЫЕ ДЕЙСТВИЯ -->
+        <!-- ===== Быстрые действия ===== -->
+        <section class="quick-actions">
+          <h3 class="qa-title">Быстрые действия</h3>
+          <div class="qa-grid" id="qaGrid"></div>
+        </section>
+
+        <style>
+        .quick-actions{margin:16px 0}
+        .qa-title{margin:0 0 10px;font-size:18px;font-weight:700}
+
+        .qa-grid{
+          display:grid;gap:12px;
+          grid-template-columns:repeat(4,minmax(0,1fr));
+        }
+        @media(max-width:1100px){.qa-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:560px){.qa-grid{grid-template-columns:1fr}}
+
+        .qa-btn{
+          display:grid;
+          grid-template-columns:auto 1fr;
+          align-items:center;
+          gap:10px;
+          min-height:56px;
+          padding:10px 14px;
+          border-radius:12px;
+          border:1px solid #2d7c33;
+          background:#2d7c33;
+          color:#fff;
+          font-weight:700;
+          box-shadow:0 2px 8px rgba(0,0,0,.04);
+          cursor:pointer;
+          transition:transform .08s ease, box-shadow .1s ease, background .1s ease, color .1s ease, border-color .1s ease;
+        }
+        .qa-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+        .qa-btn:active{transform:translateY(0)}
+        .qa-btn:focus{outline:3px solid rgba(46,160,67,.45);outline-offset:2px}
+
+        .qa-btn.secondary{
+          background:#fff;color:#2d7c33;border-color:#2d7c33;
+        }
+        .qa-btn.secondary:hover{background:#f7fbf7}
+        .qa-btn.ghost{
+          background:transparent;color:#2d7c33;border-color:#cfe5d0;
+        }
+        .qa-btn.ghost:hover{background:#eef6ee}
+
+        .qa-btn.disabled,
+        .qa-btn[aria-disabled="true"]{
+          opacity:.6;cursor:not-allowed;pointer-events:none;
+        }
+
+        .qa-ico{
+          width:26px;height:26px;
+          display:grid;place-items:center;
+          border-radius:8px;
+          background:#eef6ee;color:#2d7c33;
+          font-size:18px;
+        }
+        .qa-text{
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+          align-self:center;
+        }
+        </style>
+
+        <script>
+        const ACTIONS = [
+          { key:'pay',       label:'Оплатить',  icon:'💳', variant:'primary',   onClick:()=>window.location.href='payments.html' },
+          { key:'meters',    label:'Показания', icon:'📈', variant:'secondary', onClick:()=>window.location.href='meters.html' },
+          { key:'request',   label:'Заявка',    icon:'🛠', variant:'ghost',     onClick:()=>window.location.href='requests.html' },
+          { key:'dispatcher',label:'Диспетчер', icon:'📞', variant:'secondary', onClick:()=>callDispatcher() },
+        ];
+
+        const qaGrid = document.getElementById('qaGrid');
+
+        const classByVariant = v => {
+          if(v==='secondary') return 'qa-btn secondary';
+          if(v==='ghost') return 'qa-btn ghost';
+          return 'qa-btn';
+        };
+
+        const btnHTML = a => `
+          <button class="${classByVariant(a.variant)}"
+                  type="button"
+                  role="button"
+                  aria-label="${a.label}"
+                  data-key="${a.key}">
+            <span class="qa-ico" aria-hidden="true">${a.icon}</span>
+            <span class="qa-text">${a.label}</span>
+          </button>
+        `;
+
+        qaGrid.innerHTML = ACTIONS.map(btnHTML).join('');
+
+        qaGrid.addEventListener('click', e=>{
+          const btn = e.target.closest('.qa-btn');
+          if(!btn) return;
+          const key = btn.dataset.key;
+          const found = ACTIONS.find(x=>x.key===key);
+          if(found && typeof found.onClick==='function') found.onClick();
+        });
+        </script>
+
+    </div>
+
+    <script>
+        function callDispatcher() {
+            if (confirm('📞 Позвонить диспетчеру?\n\n8 960 072 03 21')) {
+                window.location.href = 'tel:+79600720321';
+            }
+        }
+    </script>
+
+    <script>
+        // ------ ДАННЫЕ (замени на реальные из приложения) ------
+        const units = [
+          {
+            id: 'apt-42',
+            type: 'apartment',
+            title: 'Квартира №42',
+            isPrimary: true,
+            address: 'ул. Рогачёва, д. 25/1',
+            area: '65 м²',
+            rooms: 2,
+            residents: 3,
+            floor: 5, entrance: 2,
+            account: '123456789',
+            services: ['⚡ Электричество','💧 Холодная вода','🔥 Горячая вода','🟠 Газ','♨ Отопление']
+          },
+          {
+            id: 'stor-15',
+            type: 'storage',
+            title: 'Кладовая №15',
+            isPrimary: false,
+            address: 'ул. Рогачёва, д. 25/1',
+            area: '5 м²',
+            location: 'Подвал',
+            account: '987654321',
+            services: ['⚡ Электричество']
+          }
+        ];
+
+        // ------ РЕНДЕР ------
+        const list = document.getElementById('unitsList');
+        if (list) {
+          const renderUnit = u => {
+            const badge = u.type === 'storage'
+              ? '<span class="unit-badge alt">Доп. помещение</span>'
+              : (u.isPrimary ? '<span class="unit-badge primary">Основная</span>' : '');
+
+            const details = u.type === 'apartment'
+              ? `
+                <div class="unit-item"><span class="k">Адрес:</span><span class="v clamp-2">${u.address}</span></div>
+                <div class="unit-item"><span class="k">Лицевой счёт:</span><span class="v">${u.account}</span></div>
+                <div class="unit-item"><span class="k">Площадь:</span><span class="v">${u.area}</span></div>
+                <div class="unit-item"><span class="k">Комнат:</span><span class="v">${u.rooms}</span></div>
+                <div class="unit-item"><span class="k">Жильцов:</span><span class="v">${u.residents}</span></div>
+                <div class="unit-item"><span class="k">Этаж / Подъезд:</span><span class="v">${u.floor} / ${u.entrance}</span></div>
+              `
+              : `
+                <div class="unit-item"><span class="k">Адрес:</span><span class="v clamp-2">${u.address}</span></div>
+                <div class="unit-item"><span class="k">Лицевой счёт:</span><span class="v">${u.account}</span></div>
+                <div class="unit-item"><span class="k">Площадь:</span><span class="v">${u.area}</span></div>
+                <div class="unit-item"><span class="k">Расположение:</span><span class="v">${u.location || ''}</span></div>
+              `;
+
+            const chips = (u.services || []).map(s => `<span class="chip">${s}</span>`).join('');
+
+            return `
+              <article class="unit-card" data-id="${u.id}" data-type="${u.type}">
+                <header class="unit-header">
+                  <div class="unit-name">${u.title}</div>
+                  ${badge}
+                </header>
+                <div class="unit-grid">${details}</div>
+                <div class="unit-services">${chips}</div>
+              </article>
+            `;
+          };
+
+          list.innerHTML = units.map(renderUnit).join('');
+          list.addEventListener('click', e => {
+            const card = e.target.closest('.unit-card');
+            if (!card) return;
+            const id = card.dataset.id;
+            const type = card.dataset.type;
+            console.log('open unit', { id, type });
+            // window.location.href = `/payments.html?id=${encodeURIComponent(id)}`;
+          });
+        }
+    </script>
+
+        <style>
+        /* ---- Плитки разделов ---- */
+        .tile {
+          position: relative;
+          min-height: 120px;
+          background: rgba(255,255,255,.92);
+          border: 1px solid rgba(0,0,0,.08);
+          border-radius: 16px;
+          box-shadow: 0 2px 10px rgba(0,0,0,.05);
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 12px;
+          align-items: center;
+          padding: 14px;
+          transition: transform .08s ease, box-shadow .1s ease;
+        }
+        .tile:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,0,0,.08); background: #f8fbf8; }
+        .tile .badge {
+          position: absolute;
+          top: 10px; right: 10px;
+          padding: 2px 8px;
+          border-radius: 999px;
+          font-size: 12px; font-weight: 700;
+          color: #fff; background: #d73a49;
+        }
+
+        /* ---- Чипы услуг в «Мои квартиры» ---- */
+        .unit-services {
+          display: flex; flex-wrap: wrap; gap: 6px;
+          padding-top: 8px;
+          border-top: 1px dashed rgba(0,0,0,.08);
+        }
+        .unit-services .chip {
+          padding: 6px 10px;
+          border-radius: 999px;
+          background: #eef6ee; color: #2d7c33;
+          border: 1px solid #cfe5d0;
+          font-weight: 600; font-size: 13px;
+        }
+
+        /* ---- Быстрые действия (обновлённые стили) ---- */
+        .qa-grid {
+          display: grid;
+          gap: 12px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        @media (max-width: 1100px) { .qa-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px)  { .qa-grid { grid-template-columns: 1fr; } }
+
+        .qa-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          min-height: 56px;
+          padding: 10px 14px;
+          font-weight: 700;
+          font-size: 15px;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          border: 1px solid transparent;
+        }
+        .qa-btn:focus { outline: 3px solid rgba(46,160,67,.35); outline-offset: 2px; }
+
+        /* — зелёная кнопка "Оплатить" */
+        .qa-btn.primary {
+          background: linear-gradient(180deg, #2d7c33 0%, #25682a 100%);
+          color: #fff;
+          border: 1px solid #2d7c33;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        .qa-btn.primary:hover {
+          background: linear-gradient(180deg, #319038 0%, #27702c 100%);
+          transform: translateY(-1px);
+        }
+
+        /* — второстепенные кнопки */
+        .qa-btn.secondary {
+          background: linear-gradient(180deg, #e7f3e8 0%, #d6ead7 100%);
+          color: #145c2c;
+          border: 1px solid #8bcf95;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+        .qa-btn.secondary:hover {
+          background: linear-gradient(180deg, #dff0e0 0%, #cae4cb 100%);
+          transform: translateY(-1px);
+        }
+
+        /* — иконки в кнопках */
+        .qa-ico {
+          width: 26px;
+          height: 26px;
+          display: grid;
+          place-items: center;
+          background: rgba(255, 255, 255, 0.4);
+          border-radius: 8px;
+          color: inherit;
+        }
+        .qa-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        </style>
+
+        <script>
+        // Делает первую кнопку primary, остальные secondary, если рендер динамический
+        (function(){
+          const qaButtons = Array.from(document.querySelectorAll('.qa-grid .qa-btn'));
+          if(qaButtons.length){
+            qaButtons.forEach((b, i) => {
+              b.classList.remove('primary','secondary');
+              b.classList.add(i === 0 ? 'primary' : 'secondary');
+            });
+          }
+        })();
+        </script>
+        
+        <script src="/complex-selector.js"></script>
+
+</body>
+</html>
+
+
+
+
+

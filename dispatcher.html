@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель диспетчера - ЖК Зелёная Долина</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        body {
+            background: #DCEDC8;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+            color: #1A4D2E;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            color: #2E7D32;
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .dispatcher-contact {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        header img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            padding: 28px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(46,125,50,0.1),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(76,175,80,0.18),
+                        0 4px 12px rgba(102,187,106,0.12);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .stat-number {
+            color: #2E7D32;
+            font-size: 36px;
+            font-weight: 700;
+        }
+        
+        /* Таблица заявок */
+        .requests-table-wrapper {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            padding: 28px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .requests-table-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        
+        .requests-table-wrapper h2 {
+            color: #2E7D32;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            table-layout: fixed;
+        }
+        
+        .data-table thead {
+            background: #2E7D32;
+            color: white;
+        }
+        
+        .data-table th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+            vertical-align: middle;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f5f9f5;
+        }
+        
+        .data-table tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+        
+        .data-table tbody tr:nth-child(even):hover {
+            background: #f5f9f5;
+        }
+        
+        /* Колонки */
+        .data-table th:nth-child(1),
+        .data-table td:nth-child(1) {
+            width: 80px;
+            text-align: center;
+        }
+        
+        .data-table th:nth-child(2),
+        .data-table td:nth-child(2) {
+            width: 120px;
+        }
+        
+        .data-table th:nth-child(3),
+        .data-table td:nth-child(3) {
+            width: 150px;
+        }
+        
+        .data-table th:nth-child(4),
+        .data-table td:nth-child(4) {
+            width: 180px;
+        }
+        
+        .data-table th:nth-child(5),
+        .data-table td:nth-child(5) {
+            width: 100px;
+            text-align: center;
+        }
+        
+        .data-table th:nth-child(6),
+        .data-table td:nth-child(6) {
+            width: 120px;
+            text-align: center;
+        }
+        
+        .data-table th:nth-child(7),
+        .data-table td:nth-child(7) {
+            width: auto;
+            min-width: 200px;
+        }
+        
+        /* Срочность */
+        .urgency-high {
+            font-size: 20px;
+            text-align: center;
+        }
+        
+        .urgency-medium {
+            color: #ff9800;
+            font-size: 20px;
+            text-align: center;
+        }
+        
+        .urgency-low {
+            color: #4CAF50;
+            font-size: 20px;
+            text-align: center;
+        }
+        
+        /* Кнопки действий */
+        .data-table td button {
+            padding: 8px 12px;
+            margin: 2px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .data-table td button:first-of-type {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .data-table td button:first-of-type:hover {
+            background: #45a049;
+        }
+        
+        .data-table td button:last-of-type {
+            background: #f44336;
+            color: white;
+        }
+        
+        .data-table td button:last-of-type:hover {
+            background: #da190b;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .data-table {
+                font-size: 13px;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 10px 8px;
+            }
+            
+            .data-table th:nth-child(1),
+            .data-table td:nth-child(1) {
+                width: 60px;
+            }
+            
+            .data-table th:nth-child(2),
+            .data-table td:nth-child(2) {
+                width: 100px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .requests-table-wrapper {
+                overflow-x: auto;
+            }
+            
+            .data-table {
+                min-width: 700px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="/logo-original.png" alt="УК «Зелёная Долина»">
+            <div style="flex:1">
+                <h1 style="margin:0">👨‍💼 Панель диспетчера</h1>
+                <div class="dispatcher-contact">📞 Контакт: 8 960 072 03 21</div>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>📋 Новых заявок</h3>
+                <div class="stat-number">12</div>
+            </div>
+            <div class="stat-card">
+                <h3>⚙️ В работе</h3>
+                <div class="stat-number">8</div>
+            </div>
+            <div class="stat-card">
+                <h3>⏰ Просроченных</h3>
+                <div class="stat-number">3</div>
+            </div>
+            <div class="stat-card">
+                <h3>✅ Выполнено сегодня</h3>
+                <div class="stat-number">5</div>
+            </div>
+        </div>
+
+        <div class="requests-table-wrapper">
+            <h2>Список заявок</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Дата</th>
+                        <th>Адрес</th>
+                        <th>Категория</th>
+                        <th>Срочность</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1234</td>
+                        <td>27.10 12:45</td>
+                        <td>д.3, кв.45</td>
+                        <td>Сантехника</td>
+                        <td class="urgency-high">🔴</td>
+                        <td>Новая</td>
+                        <td>
+                            <button onclick="acceptRequest(1234)">Принять</button>
+                            <button onclick="rejectRequest(1234)">Отклонить</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1235</td>
+                        <td>27.10 14:20</td>
+                        <td>д.1, кв.12</td>
+                        <td>Электрика</td>
+                        <td class="urgency-medium">🟡</td>
+                        <td>В работе</td>
+                        <td>
+                            <button onclick="acceptRequest(1235)">Принять</button>
+                            <button onclick="rejectRequest(1235)">Отклонить</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1236</td>
+                        <td>26.10 16:30</td>
+                        <td>д.5, кв.78</td>
+                        <td>Уборка подъезда</td>
+                        <td class="urgency-low">🟢</td>
+                        <td>Выполнено</td>
+                        <td>
+                            <button onclick="acceptRequest(1236)">Принять</button>
+                            <button onclick="rejectRequest(1236)">Отклонить</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1237</td>
+                        <td>27.10 09:15</td>
+                        <td>д.2, кв.33</td>
+                        <td>Замена батареи отопления</td>
+                        <td class="urgency-high">🔴</td>
+                        <td>Новая</td>
+                        <td>
+                            <button onclick="acceptRequest(1237)">Принять</button>
+                            <button onclick="rejectRequest(1237)">Отклонить</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1238</td>
+                        <td>26.10 11:00</td>
+                        <td>д.4, кв.56</td>
+                        <td>Установка домофона</td>
+                        <td class="urgency-medium">🟡</td>
+                        <td>В работе</td>
+                        <td>
+                            <button onclick="acceptRequest(1238)">Принять</button>
+                            <button onclick="rejectRequest(1238)">Отклонить</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

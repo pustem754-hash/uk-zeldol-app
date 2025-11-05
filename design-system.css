@@ -1,0 +1,381 @@
+/* ============================================
+   PREMIUM HOUSING MANAGEMENT DESIGN SYSTEM
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+    /* Primary Theme - Soft Green Base */
+    --primary-soft-green: #8BC34A;
+    --primary-green-dark: #689F38;
+    --primary-green-light: #AED581;
+    
+    /* Complex Variations */
+    --complex-northern-blue: #42A5F5;
+    --complex-northern-blue-dark: #1976D2;
+    --complex-southern-amber: #FFB300;
+    --complex-southern-amber-dark: #F57C00;
+    
+    /* Neutral Palette - Optimized for Readability */
+    --background-soft: #DCEDC8;
+    --background-light: #C8E6C9;
+    --surface-white: #FFFFFF;
+    --surface-elevated: #FFFFFF;
+    --surface-tinted: #FAFDFB;
+    --text-primary: #1A4D2E;
+    --text-secondary: #2D5F3F;
+    --text-muted: #5A7D6B;
+    --border-light: #C8E6C9;
+    --border-medium: #A5D6A7;
+    
+    /* Semantic Colors */
+    --success: #4CAF50;
+    --success-light: #81C784;
+    --warning: #FF9800;
+    --warning-light: #FFB74D;
+    --error: #F44336;
+    --error-light: #E57373;
+    --info: #2196F3;
+    --info-light: #64B5F6;
+    
+    /* Shadows - Multi-layer System */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.16);
+    --shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.2);
+    --shadow-colored: 0 8px 24px rgba(139, 195, 74, 0.25);
+    
+    /* Glass Morphism */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --glass-blur: blur(20px);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+}
+
+/* Complex Theme Overrides */
+[data-complex="northern"] {
+    --primary-accent: var(--complex-northern-blue);
+    --primary-accent-dark: var(--complex-northern-blue-dark);
+    --shadow-colored: 0 8px 24px rgba(66, 165, 245, 0.25);
+}
+
+[data-complex="southern"] {
+    --primary-accent: var(--complex-southern-amber);
+    --primary-accent-dark: var(--complex-southern-amber-dark);
+    --shadow-colored: 0 8px 24px rgba(255, 179, 0, 0.25);
+}
+
+[data-complex="default"] {
+    --primary-accent: var(--primary-soft-green);
+    --primary-accent-dark: var(--primary-green-dark);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background: var(--background-soft);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   PREMIUM CARD SYSTEM
+   ============================================ */
+
+.premium-card {
+    background: var(--surface-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-medium);
+    border: 1.5px solid var(--border-light);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        var(--primary-soft-green) 0%, 
+        var(--primary-accent) 100%);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.premium-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-strong);
+    border-color: var(--primary-accent);
+}
+
+.premium-card:hover::before {
+    opacity: 1;
+}
+
+.premium-card.elevated {
+    box-shadow: var(--shadow-elevated);
+}
+
+/* Glass Morphism Card */
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-medium);
+}
+
+/* ============================================
+   BUTTON SYSTEM
+   ============================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-soft-green) 0%, var(--primary-accent) 100%);
+    color: white;
+    box-shadow: var(--shadow-colored);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-strong);
+}
+
+.btn-secondary {
+    background: var(--surface-white);
+    color: var(--primary-accent);
+    border: 2px solid var(--primary-accent);
+}
+
+.btn-secondary:hover {
+    background: var(--primary-accent);
+    color: white;
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-medium);
+}
+
+.btn-ghost:hover {
+    background: var(--background-soft);
+    border-color: var(--primary-accent);
+    color: var(--primary-accent);
+}
+
+/* ============================================
+   BADGE SYSTEM
+   ============================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, var(--success-light) 0%, var(--success) 100%);
+    color: white;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, var(--warning-light) 0%, var(--warning) 100%);
+    color: white;
+}
+
+.badge-error {
+    background: linear-gradient(135deg, var(--error-light) 0%, var(--error) 100%);
+    color: white;
+}
+
+.badge-info {
+    background: linear-gradient(135deg, var(--info-light) 0%, var(--info) 100%);
+    color: white;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-fade-slide {
+    animation: fadeSlide var(--transition-base) ease-out;
+}
+
+.animate-scale-in {
+    animation: scaleIn var(--transition-fast) ease-out;
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, 
+        var(--border-light) 25%, 
+        var(--border-medium) 50%, 
+        var(--border-light) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+
+.bg-surface { background: var(--surface-white); }
+.bg-soft { background: var(--background-soft); }
+
+.shadow-soft { box-shadow: var(--shadow-soft); }
+.shadow-medium { box-shadow: var(--shadow-medium); }
+.shadow-strong { box-shadow: var(--shadow-strong); }
+
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    :root {
+        --spacing-lg: 16px;
+        --spacing-xl: 24px;
+    }
+    
+    .premium-card {
+        padding: var(--spacing-md);
+        border-radius: var(--radius-lg);
+    }
+}
+

@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Платежи и квитанции - УК Зелёная Долина</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #DCEDC8;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1A4D2E;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        .header img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header h1 { color: #2E7D32; font-size: 24px; margin-bottom: 10px; }
+        /* УВЕЛИЧЕННАЯ И ЖИРНАЯ СТРЕЛКА НАЗАД! */
+        .back-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s;
+        }
+        .back-btn:hover { background: #2E7D32; transform: translateY(-2px); }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .service-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(46,125,50,0.1),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(76,175,80,0.18),
+                        0 4px 12px rgba(102,187,106,0.12);
+        }
+        .service-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .service-icon { font-size: 32px; }
+        .service-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        /* Единые цвета статусов */
+        .status-paid { background: #4CAF50; color: white; font-weight: 600; }
+        .status-unpaid { background: #f44336; color: white; font-weight: 600; }
+        .status-partial { background: #FF9800; color: white; font-weight: 600; }
+        .service-name { font-size: 16px; color: #666; margin-bottom: 10px; }
+        .service-amount { font-size: 24px; font-weight: bold; color: #2E7D32; }
+        
+        /* НОВЫЕ СТИЛИ ДЛЯ КВИТАНЦИИ */
+        .receipt-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f8f4 100%);
+            padding: 28px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .receipt-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 8px; /* чтобы последний столбец не прилипал к краю */
+            max-height: 60vh; /* позволяет появиться вертикальному скроллу при большом списке */
+            overflow-y: auto;
+        }
+        
+        .meters-table {
+            display: grid;
+            grid-template-columns:
+                40px                              /* № */
+                minmax(200px, 3fr)                /* Услуга (шире) */
+                minmax(120px, max-content)        /* Предыдущее */
+                minmax(120px, max-content)        /* Текущее */
+                minmax(90px, max-content)         /* Расход */
+                minmax(120px, max-content)        /* Тариф */
+                minmax(140px, max-content);       /* Сумма */
+            gap: 8px;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 768px) {
+            .receipt-section { padding: 18px; }
+            .meters-table {
+                grid-template-columns:
+                    32px
+                    minmax(130px, 2fr)
+                    minmax(100px, 1fr)
+                    minmax(100px, 1fr)
+                    minmax(70px, 0.8fr)
+                    minmax(95px, 1.1fr)
+                    minmax(115px, 1.4fr);
+                font-size: 12px;
+                gap: 6px;
+            }
+            .meters-header > div,
+            .meters-row > div { padding: 10px; }
+            .meter-input { padding: 8px; font-size: 13px; }
+            .meters-row > div, .meters-header > div { white-space: nowrap; }
+            .table-scroll { overflow-x: auto; } /* горизонтальный скролл всей таблицы */
+        }
+        @media (max-width: 1024px) {
+            .meters-table {
+                grid-template-columns:
+                    36px
+                    minmax(140px, 2fr)
+                    minmax(110px, 1.1fr)
+                    minmax(110px, 1.1fr)
+                    minmax(80px, 0.9fr)
+                    minmax(100px, 1.1fr)
+                    minmax(120px, 1.5fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .receipt-section { padding: 15px; }
+            .meters-table {
+                grid-template-columns:
+                    28px
+                    minmax(120px, 2fr)
+                    minmax(90px, 1fr)
+                    minmax(90px, 1fr)
+                    minmax(64px, 0.8fr)
+                    minmax(88px, 1.1fr)
+                    minmax(110px, 1.5fr);
+                font-size: 11px;
+                gap: 6px;
+            }
+            .meters-header > div,
+            .meters-row > div { padding: 8px; }
+            .meter-input { padding: 7px; font-size: 12px; }
+            .meters-row > div, .meters-header > div { white-space: nowrap; }
+        }
+        
+        .meters-header, .meters-row {
+            display: contents;
+        }
+        
+        .meters-header > div {
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            text-align: center;
+            word-break: break-word;
+            white-space: nowrap;
+            position: sticky; /* липкие заголовки */
+            top: 0;
+            z-index: 2;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+        }
+        
+        .meters-row > div {
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            text-align: right;
+            word-break: normal;
+            white-space: nowrap; /* не переносим на широких экранах */
+            line-height: 1.35;
+        }
+        
+        .meters-row > div:first-child {
+            text-align: center; /* № */
+            justify-content: center;
+        }
+
+        /* Выравнивание по колонкам: 1 центр, 2 лево, 3-7 право */
+        .meters-header > div:nth-child(1),
+        .meters-row > div:nth-child(1) { text-align: center; justify-content: center; }
+        .meters-header > div:nth-child(2),
+        .meters-row > div:nth-child(2) { text-align: left; justify-content: flex-start; }
+        .meters-header > div:nth-child(n+3),
+        .meters-row > div:nth-child(n+3) { text-align: right; justify-content: flex-end; }
+ 
+        .meter-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            background: white;
+            transition: all 0.2s;
+            height: 38px;
+            line-height: 1.2;
+        }
+        
+        .meter-input:focus {
+            outline: none;
+            border-color: #2E7D32;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+        
+        .meter-input.error {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+        
+        .detailed-calc {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .calc-row.fixed {
+            background: #fff9e6;
+        }
+        
+        .calc-row .calc-value.paid {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .calc-label {
+            flex: 1;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .calc-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2E7D32;
+        }
+        
+        .calc-value.total {
+            font-size: 24px;
+            color: #2E7D32;
+        }
+        
+        .calc-details {
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        .calc-divider {
+            border-top: 2px solid #4CAF50;
+            margin: 10px 0;
+        }
+        
+        .calc-total {
+            background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .calc-total .calc-label,
+        .calc-total .calc-value {
+            color: white !important;
+        }
+        
+        .validation-message {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #c62828;
+        }
+        
+        .validation-success {
+            background: #e8f5e9;
+            border-left-color: #4CAF50;
+            color: #2e7d32;
+        }
+        /* Readings table (semantic) */
+        .table-wrap {
+            max-width: 100%;
+            overflow-x: auto;
+            padding-right: 8px;
+        }
+        .readings-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            background: transparent;
+        }
+        .readings-table .col-no     { width: 6%; }
+        .readings-table .col-service{ width: 26%; }
+        .readings-table .col-prev   { width: 150px; }
+        .readings-table .col-now    { width: 14%; }
+        .readings-table .col-usage  { width: 11%; }
+        .readings-table .col-tariff { width: 13.5%; }
+        .readings-table .col-total  { width: 15.5%; }
+        .readings-table th,
+        .readings-table td {
+            padding: 10px 12px;
+            border: 1px solid rgba(0,0,0,.08);
+            vertical-align: middle;
+            line-height: 1.2;
+            overflow: visible; /* никаких скрытий */
+            text-overflow: clip; /* без многоточий */
+        }
+        .readings-table td.tr,
+        .readings-table td.nowrap {
+            padding-right: 16px; /* запас справа под последний символ */
+            box-sizing: border-box;
+        }
+        .readings-table th {
+            font-weight: 700;
+            text-align: center;
+            background: #2E7D32;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            white-space: normal;  /* allow wrap to two lines */
+            word-break: keep-all;
+        }
+        /* Allow header wrapping everywhere */
+        th { white-space: normal; line-height: 1.2; }
+        .nowrap { white-space: nowrap; }
+        .tl { text-align: left; }
+        .tc { text-align: center; }
+        .tr { text-align: right; }
+        .strong { font-weight: 600; }
+        .read-input {
+            width: 100%;
+            max-width: 140px;
+            padding: 6px 8px;
+            border: 1px solid #7fbf84;
+            border-radius: 6px;
+            text-align: center;
+            background: #fff;
+            height: 36px;
+        }
+        @media (max-width: 768px) {
+            .readings-table th, .readings-table td { padding: 8px 10px; }
+            .read-input { max-width: 120px; height: 34px; }
+        }
+        /* Section cards and amounts */
+        .section-card { 
+            background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%); 
+            padding: 24px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 24px rgba(46,125,50,0.1),
+                        0 2px 8px rgba(76,175,80,0.08);
+            border: 1px solid rgba(129,199,132,0.2);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+        .amount { text-align: right; font-variant-numeric: tabular-nums; }
+        .fixed-row { background: #f7f7f7; }
+        .muted { color: #666; font-size: 13px; }
+        .divider { border-top: 2px solid #e9ecef; margin: 14px 0; }
+        .label-2lines { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .subtotal { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: #fafafa; border-radius: 8px; margin-top: 10px; }
+        .subtotal .title { color: #333; font-weight: 600; }
+        .subtotal .value { font-weight: 700; color: #2E7D32; font-size: 16px; }
+        @media (max-width: 768px) { .section-card { padding: 16px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">← Назад</a>
+            <img src="/logo-original.png" alt="УК «Зелёная Долина»">
+            <h1>💳 Платежи и квитанции</h1>
+        </div>
+
+        <!-- ИНФОРМАЦИЯ О СОБСТВЕННИКЕ -->
+        <div class="header" style="background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%); color: white;">
+            <div>
+                <h2 style="color: white; margin-bottom: 10px;">Миннуллина Н.М.</h2>
+                <p style="font-size: 18px; margin-bottom: 5px;">📍 г. Казань, ул. Чистопольская, д. 5, кв. 142</p>
+                <p style="font-size: 14px; opacity: 0.9;">Лицевой счёт: <strong>810596550</strong> | Площадь помещения: <strong>61,9 кв.м</strong> | Количество проживающих: <strong>4</strong></p>
+                <p style="font-size: 14px; opacity: 0.9; margin-top: 5px;">📅 Период: <strong>Январь 2025</strong> | Срок оплаты: <strong>до 25.02.2025</strong> | Показания до: <strong>28.02.2025</strong></p>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">7 834 ₽</div>
+                <div style="font-size: 14px; opacity: 0.9;">К оплате за январь</div>
+            </div>
+        </div>
+
+        <!-- ПОКАЗАНИЯ СЧЕТЧИКОВ -->
+        <div class="receipt-section">
+            <h2 style="color: #2E7D32; margin-bottom: 15px;">📊 Показания счетчиков</h2>
+            <div class="table-wrap">
+              <table class="readings-table">
+                <colgroup>
+                  <col class="col-no" />
+                  <col class="col-service" />
+                  <col class="col-prev" />
+                  <col class="col-now" />
+                  <col class="col-usage" />
+                  <col class="col-tariff" />
+                  <col class="col-total" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>№</th>
+                    <th>Услуга</th>
+                    <th>Пред. показание</th>
+                    <th>Текущее<br>показание</th>
+                    <th>Расход</th>
+                    <th>Тариф</th>
+                    <th>Сумма</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tc">1</td>
+                    <td class="tl">⚡ Электроэнергия</td>
+                    <td class="tr nowrap">1&nbsp;234&nbsp;<span class="unit" style="color:#666;">кВт·ч</span></td>
+                    <td class="tr">
+                      <input class="read-input meter-input" type="number" value="1456" min="1234" step="1" placeholder="Введите показание" data-service="electricity" data-prev="1234" data-unit="кВт·ч" />
+                    </td>
+                    <td class="tr nowrap"><span id="electricity-usage">222</span>&nbsp;<span class="unit" style="color:#666;">кВт·ч</span></td>
+                    <td class="tr nowrap td-tariff">5,96&nbsp;<span class="unit" style="color:#666;">₽/кВт·ч</span></td>
+                    <td class="tr strong nowrap"><span id="electricity-sum" class="currency">1&nbsp;324,12&nbsp;₽</span></td>
+                  </tr>
+                  <tr>
+                    <td class="tc">2</td>
+                    <td class="tl">💧 Холодная вода</td>
+                    <td class="tr nowrap">342&nbsp;<span class="unit" style="color:#666;">м³</span></td>
+                    <td class="tr"><input class="read-input meter-input" type="number" value="367" min="342" step="0.01" placeholder="Введите показание" data-service="cold-water" data-prev="342" data-unit="м³" /></td>
+                    <td class="tr nowrap"><span id="cold-water-usage">25</span>&nbsp;<span class="unit" style="color:#666;">м³</span></td>
+                    <td class="tr nowrap td-tariff">20,92&nbsp;<span class="unit" style="color:#666;">₽/м³</span></td>
+                    <td class="tr strong nowrap"><span id="cold-water-sum" class="currency">523,00&nbsp;₽</span></td>
+                  </tr>
+                  <tr>
+                    <td class="tc">3</td>
+                    <td class="tl">🔥 Горячая вода</td>
+                    <td class="tr nowrap">178&nbsp;<span class="unit" style="color:#666;">м³</span></td>
+                    <td class="tr"><input class="read-input meter-input" type="number" value="199" min="178" step="0.01" placeholder="Введите показание" data-service="hot-water" data-prev="178" data-unit="м³" /></td>
+                    <td class="tr nowrap"><span id="hot-water-usage">21</span>&nbsp;<span class="unit" style="color:#666;">м³</span></td>
+                    <td class="tr nowrap td-tariff">44,86&nbsp;<span class="unit" style="color:#666;">₽/м³</span></td>
+                    <td class="tr strong nowrap"><span id="hot-water-sum" class="currency">942,06&nbsp;₽</span></td>
+                  </tr>
+                  <tr>
+                    <td class="tc">4</td>
+                    <td class="tl">🔥 Газоснабжение</td>
+                    <td class="tr nowrap">156&nbsp;<span class="unit" style="color:#666;">м³</span></td>
+                    <td class="tr"><input class="read-input meter-input" type="number" value="183" min="156" step="0.01" placeholder="Введите показание" data-service="gas" data-prev="156" data-unit="м³" /></td>
+                    <td class="tr nowrap"><span id="gas-usage">27</span>&nbsp;<span class="unit" style="color:#666;">м³</span></td>
+                    <td class="tr nowrap td-tariff">25,11&nbsp;<span class="unit" style="color:#666;">₽/м³</span></td>
+                    <td class="tr strong nowrap"><span id="gas-sum" class="currency">677,97&nbsp;₽</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #4CAF50;">
+                <p style="color: #2e7d32; font-size: 13px; margin: 0;">💡 <strong>Как вводить показания:</strong></p>
+                <ul style="color: #2e7d32; font-size: 12px; margin: 8px 0 0 0; padding-left: 20px;">
+                    <li>Введите показания со счетчика (только целую часть без запятой)</li>
+                    <li>Для воды и газа можно использовать дробные значения (например: 342.5)</li>
+                    <li>Текущее показание не может быть меньше предыдущего</li>
+                    <li>Расход и сумма рассчитываются автоматически</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ОДН (Общедомовые нужды) -->
+        <div class="section-card">
+            <h2 style="color: #2E7D32; margin-bottom: 12px;">🏢 Общедомовые нужды (ОДН)</h2>
+            <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px;">
+                <div class="label-2lines">⚡ Электроэнергия (ОДН)</div>
+                <div class="amount">312,44 ₽</div>
+                <div class="label-2lines">💧 Холодная вода (ОДН)</div>
+                <div class="amount">145,20 ₽</div>
+                <div class="label-2lines">🔥 Горячая вода (ОДН)</div>
+                <div class="amount">198,51 ₽</div>
+            </div>
+            <div class="divider"></div>
+            <div class="subtotal">
+                <div class="title">ОДН: итого</div>
+                <div class="value">656,15 ₽</div>
+            </div>
+        </div>
+
+        <!-- ДЕТАЛЬНЫЕ РАСЧЕТЫ -->
+        <div class="receipt-section">
+            <h2 style="color: #2E7D32; margin-bottom: 15px;">💰 Детальный расчет</h2>
+            <div class="detailed-calc">
+                <div class="calc-row">
+                    <div class="calc-label">⚡ Электроснабжение:</div>
+                    <div class="calc-value">
+                        <span class="calc-details">222 × 5.96 = <span id="calc-electricity">1 324.12</span> ₽</span>
+                    </div>
+                </div>
+                <div class="calc-row">
+                    <div class="calc-label">💧 Холодное водоснабжение:</div>
+                    <div class="calc-value">
+                        <span class="calc-details">25 × 20.92 = <span id="calc-cold-water">523.00</span> ₽</span>
+                    </div>
+                </div>
+                <div class="calc-row">
+                    <div class="calc-label">🔥 Горячее водоснабжение:</div>
+                    <div class="calc-value">
+                        <span class="calc-details">21 × 44.86 = <span id="calc-hot-water">942.06</span> ₽</span>
+                    </div>
+                </div>
+                <div class="calc-row">
+                    <div class="calc-label">🔥 Газоснабжение:</div>
+                    <div class="calc-value">
+                        <span class="calc-details">27 × 25.11 = <span id="calc-gas">677.97</span> ₽</span>
+                    </div>
+                </div>
+                <div class="calc-row fixed">
+                    <div class="calc-label">🏠 Содержание и ремонт (фиксировано):</div>
+                    <div class="calc-value">2 156.00 ₽</div>
+                </div>
+                <div class="calc-row fixed">
+                    <div class="calc-label">🗑️ Обращение с ТКО (фиксировано):</div>
+                    <div class="calc-value">456.00 ₽</div>
+                </div>
+                <div class="calc-row fixed">
+                    <div class="calc-label">🔧 Взнос на капремонт (фиксировано):</div>
+                    <div class="calc-value">918.00 ₽</div>
+                </div>
+                <div class="calc-row">
+                    <div class="calc-label">♨️ Отопление (оплачено ранее):</div>
+                    <div class="calc-value paid">1 845.00 ₽</div>
+                </div>
+                <div class="calc-divider"></div>
+                <div class="subtotal"><span class="title">Коммунальные услуги:</span><span class="value">3 466,15 ₽</span></div>
+                <div class="subtotal"><span class="title">Жилищные услуги:</span><span class="value">3 510,00 ₽</span></div>
+                <div class="calc-divider"></div>
+                <div class="calc-total">
+                    <div class="calc-label">📊 Итого к оплате:</div>
+                    <div class="calc-value total">7 834.15 ₽</div>
+                </div>
+                <div class="muted" style="margin-top:10px;">Период начислений: 01.01.2025 — 31.01.2025</div>
+            </div>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-header">
+                    <span class="service-icon">⚡</span>
+                    <span class="service-status status-unpaid">Не оплачено</span>
+                </div>
+                <div class="service-name">Электроснабжение</div>
+                <div class="service-amount">1 324 ₽</div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <span class="service-icon">💧</span>
+                    <span class="service-status status-unpaid">Не оплачено</span>
+                </div>
+                <div class="service-name">Холодное водоснабжение</div>
+                <div class="service-amount">523 ₽</div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <span class="service-icon">🔥</span>
+                    <span class="service-status status-unpaid">Не оплачено</span>
+                </div>
+                <div class="service-name">Горячее водоснабжение</div>
+                <div class="service-amount">942 ₽</div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <span class="service-icon">🔥</span>
+                    <span class="service-status status-unpaid">Не оплачено</span>
+                </div>
+                <div class="service-name">Газоснабжение</div>
+                <div class="service-amount">678 ₽</div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <span class="service-icon">🏠</span>
+                    <span class="service-status status-unpaid">Не оплачено</span>
+                </div>
+                <div class="service-name">Содержание и ремонт жилого помещения</div>
+                <div class="service-amount">2 156 ₽</div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <span class="service-icon">♨️</span>
+                    <span class="service-status status-paid">Оплачено</span>
+                </div>
+                <div class="service-name">Отопление</div>
+                <div class="service-amount">1 845 ₽</div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <span class="service-icon">🗑️</span>
+                    <span class="service-status status-unpaid">Не оплачено</span>
+                </div>
+                <div class="service-name">Обращение с ТКО (мусор)</div>
+                <div class="service-amount">456 ₽</div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <span class="service-icon">🔧</span>
+                    <span class="service-status status-unpaid">Не оплачено</span>
+                </div>
+                <div class="service-name">Взнос на капитальный ремонт</div>
+                <div class="service-amount">918 ₽</div>
+            </div>
+        </div>
+
+        <!-- КНОПКИ ДЕЙСТВИЙ -->
+        <div class="header" style="text-align: center;">
+            <button onclick="payOnline()" style="padding: 18px 40px; background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin: 5px; box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">💳 Оплатить онлайн</button>
+            <button onclick="downloadReceipt()" style="padding: 18px 40px; background: white; color: #2E7D32; border: 2px solid #4CAF50; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin: 5px; transition: all 0.3s;" onmouseover="this.style.background='#f5f5f5';" onmouseout="this.style.background='white';">📄 Скачать квитанцию PDF</button>
+            <button onclick="uploadReceipt()" style="padding: 18px 40px; background: white; color: #2E7D32; border: 2px solid #4CAF50; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin: 5px; transition: all 0.3s;" onmouseover="this.style.background='#f5f5f5';" onmouseout="this.style.background='white';">📸 Загрузить чек об оплате</button>
+        </div>
+
+        <!-- QR-КОД ДЛЯ БЫСТРОЙ ОПЛАТЫ -->
+        <div class="receipt-section">
+            <h2 style="color: #2E7D32; margin-bottom: 15px;">📱 QR-код для быстрой оплаты</h2>
+            <div style="text-align: center; padding: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div id="qrcode" style="width: 200px; height: 200px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; border-radius: 10px; margin: 0 auto 15px;">
+                        <canvas id="qrcode-canvas" width="200" height="200"></canvas>
+                    </div>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 10px;">Отсканируйте код для оплаты</p>
+                    <p style="color: #999; font-size: 12px;">Оплата через СБП</p>
+                </div>
+            </div>
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                <p style="color: #666; font-size: 14px; margin-bottom: 5px;">💡 <strong>Как использовать:</strong></p>
+                <ul style="color: #666; font-size: 13px; padding-left: 20px;">
+                    <li>Откройте приложение вашего банка</li>
+                    <li>Выберите "Оплатить по QR-коду"</li>
+                    <li>Отсканируйте код на экране</li>
+                    <li>Подтвердите оплату</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ФОРМА ОТПРАВКИ ПОКАЗАНИЙ СЧЕТЧИКОВ -->
+        <div class="receipt-section">
+            <h2 style="color: #2E7D32; margin-bottom: 15px;">📊 Передать показания счетчиков</h2>
+            <div id="readings-form">
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <p style="color: #2e7d32; font-size: 14px; margin-bottom: 5px;">✅ Последняя передача: 25.01.2025</p>
+                    <p style="color: #666; font-size: 12px;">Следующая передача: до 28.01.2025</p>
+                </div>
+                
+                <form id="meter-readings-form">
+                    <div style="display: grid; gap: 15px; margin-bottom: 20px;">
+                        <!-- Показания уже в таблице выше - здесь кнопка отправки -->
+                        <div style="text-align: center; padding: 20px; background: #f9f9f9; border-radius: 10px;">
+                            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Показания вводятся в таблице выше. После заполнения нажмите кнопку ниже.</p>
+                            <button type="button" onclick="submitReadings()" style="padding: 15px 40px; background: #4CAF50; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);">
+                                ✓ Отправить показания
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; border-left: 4px solid #ff9800;">
+                    <p style="color: #e65100; font-size: 13px; margin: 0;">⚠️ <strong>Важно:</strong> Передавайте показания до 28 числа каждого месяца. При задержке расчет будет по среднему значению.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- =============== Начисления (карточки) =============== -->
+        <section class="charges" id="chargesSection">
+          <h3 class="charges-title">Начисления</h3>
+
+          <!-- GRID карточек -->
+          <div class="charges-grid" id="chargesGrid"></div>
+
+          <!-- Итоги -->
+          <div class="charges-summary">
+            <div class="row">
+              <div class="label">Коммунальные услуги:</div>
+              <div class="value" id="sumCommunal">—</div>
+            </div>
+            <div class="row" id="rowHousing">
+              <div class="label">Жилищные услуги:</div>
+              <div class="value" id="sumHousing">—</div>
+            </div>
+            <div class="row" id="rowODN" hidden>
+              <div class="label">ОДН:</div>
+              <div class="value" id="sumODN">—</div>
+            </div>
+            <div class="row muted" id="rowPaidBefore" hidden>
+              <div class="label">Оплачено ранее:</div>
+              <div class="value" id="sumPaidBefore">—</div>
+            </div>
+            <div class="row total">
+              <div class="label">Итого к оплате:</div>
+              <div class="value" id="sumTotal">—</div>
+            </div>
+            <div class="period" id="billingPeriodText">Период начислений: —</div>
+          </div>
+        </section>
+
+        <style>
+        /* ===== Стили блока начислений ===== */
+        .charges { margin: 18px 0 12px; }
+        .charges-title { margin: 0 0 10px; font-size: 18px; font-weight: 700; }
+
+        .charges-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .charge-card {
+          background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+          border: 1px solid rgba(129,199,132,0.25);
+          border-radius: 18px;
+          padding: 18px;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          grid-template-rows: auto auto;
+          row-gap: 8px;
+          column-gap: 10px;
+          box-shadow: 0 6px 20px rgba(46,125,50,0.1),
+                      0 2px 6px rgba(76,175,80,0.08);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .charge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+            opacity: 0.6;
+        }
+        
+        .charge-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(76,175,80,0.15),
+                        0 4px 10px rgba(102,187,106,0.1);
+        }
+
+        .charge-name {
+          font-weight: 600;
+          line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          grid-column: 1 / 2;
+        }
+
+        .charge-badge {
+          justify-self: end;
+          align-self: start;
+          padding: 4px 8px;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 700;
+          color: #fff;
+        }
+
+        /* Единые цвета бейджей */
+        .badge-paid { background: #4CAF50; color: white; }
+        .badge-unpaid { background: #f44336; color: white; }
+        .badge-partial { background: #FF9800; color: white; }
+
+        .charge-amount {
+          grid-column: 1 / -1;
+          text-align: right;
+          font-size: 22px;
+          font-weight: 700;
+          line-height: 1;
+          color: #2E7D32;
+        }
+
+        .charges-summary {
+          margin-top: 18px;
+          background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+          border: 1px solid rgba(129,199,132,0.25);
+          border-radius: 18px;
+          padding: 20px;
+          box-shadow: 0 8px 24px rgba(46,125,50,0.1),
+                      0 2px 8px rgba(76,175,80,0.08);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .charges-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+        }
+
+        .charges-summary .row {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          padding: 6px 4px;
+          align-items: center;
+          border-bottom: 1px dashed rgba(0,0,0,.08);
+        }
+        .charges-summary .row:last-child { border-bottom: 0; }
+
+        .charges-summary .label { opacity: .85; }
+        .charges-summary .value { font-weight: 700; text-align: right; color: #2E7D32; }
+
+        .charges-summary .row.total {
+          background: rgba(46,125,50,.15);
+          border-radius: 8px;
+          margin-top: 6px;
+          padding: 10px 8px;
+        }
+        .charges-summary .row.total .value {
+          color: #2E7D32;
+          font-size: 18px;
+        }
+        .charges-summary .row.muted .value { font-weight: 600; opacity: .8; color: #666; }
+        .charges-summary .period { margin-top: 6px; font-size: 13px; opacity: .8; }
+
+        @media (max-width: 1100px) {
+          .charges-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 640px) {
+          .charges-grid { grid-template-columns: 1fr; }
+          .charge-amount { font-size: 20px; }
+        }
+        </style>
+
+        <script>
+        (function(){
+        /** ====== КЛЮЧ ЧЕРНОВИКА ====== */
+        const DRAFT_KEY = 'meters_draft_v2';
+
+        // ======== Модель данных (замени на реальные данные приложения) ========
+        const DATA = {
+          periodText: '01.01.2025 — 31.01.2025',
+          paidBefore: 0,
+          communal: [
+            { key:'electricity', name:'Электроснабжение', amount: 1324, status:'unpaid' },
+            { key:'cold',        name:'Холодное водоснабжение', amount: 523, status:'unpaid' },
+            { key:'hot',         name:'Горячее водоснабжение', amount: 942, status:'unpaid' },
+            { key:'gas',         name:'Газоснабжение', amount: 678, status:'unpaid' },
+          ],
+          housing: [
+            { key:'maintenance', name:'Содержание и ремонт жилого помещения', amount: 2156, status:'unpaid' },
+            { key:'tko',         name:'Обращение с ТКО (мусор)', amount: 456, status:'unpaid' },
+            { key:'capex',       name:'Взнос на капитальный ремонт', amount: 918, status:'unpaid' },
+          ],
+          odn: { show: false, items: [] },
+          heating: { name:'Отопление', amount: 1845, status:'paid' }
+        };
+
+        // ======== Утилиты форматирования ========
+        const nbsp = String.fromCharCode(160);
+        const formatCurrency = n =>
+          (n % 1 === 0
+            ? n.toLocaleString('ru-RU', { maximumFractionDigits: 0 })
+            : n.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          ).replace(/\s/g, nbsp) + nbsp + '₽';
+
+        // ======== Рендер карточек ========
+        const grid = document.getElementById('chargesGrid');
+
+        function badgeClass(status) {
+          if (status === 'paid') return 'badge-paid';
+          if (status === 'partial') return 'badge-partial';
+          return 'badge-unpaid';
+        }
+        function badgeText(status) {
+          if (status === 'paid') return 'Оплачено';
+          if (status === 'partial') return 'Частично';
+          return 'Не оплачено';
+        }
+
+        function cardHTML(name, amount, status) {
+          return `
+            <div class="charge-card" role="group" aria-label="${name}">
+              <div class="charge-name">${name}</div>
+              <div class="charge-badge ${badgeClass(status)}">${badgeText(status)}</div>
+              <div class="charge-amount">${formatCurrency(amount)}</div>
+            </div>
+          `;
+        }
+
+        // 7 услуг, идущих в оплату
+        const seven = [...DATA.communal, ...DATA.housing].slice(0, 7);
+        grid.insertAdjacentHTML('beforeend', seven.map(i => cardHTML(i.name, i.amount, i.status)).join(''));
+
+        // Отопление — отдельная карточка в конце
+        grid.insertAdjacentHTML('beforeend', cardHTML(DATA.heating.name, DATA.heating.amount, DATA.heating.status));
+
+        // ======== Подсчёты ========
+        const sum = arr => arr.reduce((a, x) => a + (+x.amount || 0), 0);
+
+        const communalTotal = sum(DATA.communal) + (DATA.odn?.show ? sum(DATA.odn.items) : 0);
+        const housingTotal  = sum(DATA.housing);
+        const paidBefore    = +DATA.paidBefore || 0;
+
+        // Итог к оплате: 7 услуг + (отопление, если не оплачено) + ОДН (если есть) − оплачено ранее
+        let grand = communalTotal + housingTotal - paidBefore;
+        if (DATA.heating.status !== 'paid') grand += DATA.heating.amount;
+
+        // ======== Вывод итогов ========
+        document.getElementById('sumCommunal').textContent = formatCurrency(communalTotal);
+        document.getElementById('sumHousing').textContent  = formatCurrency(housingTotal);
+
+        if (DATA.odn?.show) {
+          document.getElementById('rowODN').hidden = false;
+          document.getElementById('sumODN').textContent = formatCurrency(sum(DATA.odn.items));
+        }
+
+        if (paidBefore > 0) {
+          document.getElementById('rowPaidBefore').hidden = false;
+          document.getElementById('sumPaidBefore').textContent = formatCurrency(paidBefore);
+        }
+
+        document.getElementById('sumTotal').textContent = formatCurrency(grand);
+        document.getElementById('billingPeriodText').textContent = 'Период начислений: ' + (DATA.periodText || '—');
+        })();
+        </script>
+
+        <!-- ПЛАТЕЖИ ПО МЕСЯЦАМ (КАК В ЭТАЛОНЕ) -->
+        <div class="monthly-payments">
+            <h2 style="color: #2E7D32; margin-bottom: 20px;">📅 Платежи по месяцам</h2>
+            
+            <!-- Текущий месяц -->
+            <div class="month-card current-month">
+                <div class="month-header">
+                    <h3>Январь 2025</h3>
+                    <span class="status-badge unpaid">Ожидает оплаты</span>
+                </div>
+                <div class="month-details">
+                    <div class="month-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Сумма:</span>
+                            <span class="summary-value">7 834 ₽</span>
+                        </div>
+                    </div>
+                    <div class="month-breakdown">
+                        <div class="breakdown-item">
+                            <span>⚡ Электроснабжение:</span>
+                            <span class="amount">1 324 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>💧 Холодное водоснабжение:</span>
+                            <span>523 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔥 Горячее водоснабжение:</span>
+                            <span>942 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔥 Газоснабжение:</span>
+                            <span>678 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🏠 Содержание:</span>
+                            <span class="amount">1 580 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🗑️ Обращение с ТКО:</span>
+                            <span>456 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔧 Взнос на капремонт:</span>
+                            <span>918 ₽</span>
+                        </div>
+                        <div class="breakdown-item" style="grid-column: 1 / -1; background: #f5f5f5; font-weight: bold;">
+                            <span>♨️ Отопление (оплачено):</span>
+                            <span>1 845 ₽</span>
+                        </div>
+                    </div>
+                    <div class="month-actions">
+                        <button class="btn-primary" style="padding: 12px 24px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 10px;" onclick="payOnline()">💳 Оплатить</button>
+                        <button class="btn-secondary" style="padding: 12px 24px; background: #f5f5f5; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="downloadReceipt()">📄 Квитанция</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Декабрь 2024 -->
+            <div class="month-card">
+                <div class="month-header">
+                    <h3>Декабрь 2024</h3>
+                    <span class="status-badge paid">Оплачено</span>
+                </div>
+                <div class="month-details">
+                    <div class="month-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Сумма:</span>
+                            <span class="summary-value">6 120 ₽</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Дата оплаты:</span>
+                            <span class="summary-value">05.01.2025</span>
+                        </div>
+                    </div>
+                    <div class="month-breakdown">
+                        <div class="breakdown-item">
+                            <span>⚡ Электричество:</span>
+                            <span>1 180 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>💧 Холодная вода:</span>
+                            <span>465 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔥 Горячая вода:</span>
+                            <span>870 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔥 Газ:</span>
+                            <span>595 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🏠 Содержание:</span>
+                            <span class="amount">1 580 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🗑️ Мусор:</span>
+                            <span>420 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔧 Капремонт:</span>
+                            <span>600 ₽</span>
+                        </div>
+                    </div>
+                    <div class="month-actions">
+                        <button class="btn-secondary" style="padding: 12px 24px; background: #f5f5f5; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="downloadReceipt()">📄 Скачать квитанцию</button>
+                        <button class="btn-secondary" style="padding: 12px 24px; background: #e3f2fd; color: #1976d2; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="showPaymentDetails()">ℹ️ Подробнее</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Октябрь 2024 (ЧАСТИЧНО ОПЛАЧЕНО) -->
+            <div class="month-card" style="background: #fef7e6; border-left-color: #ff9800;">
+                <div class="month-header">
+                    <h3>Октябрь 2024</h3>
+                    <span class="status-badge" style="background: #ff9800; color: white;">Частично оплачено</span>
+                </div>
+                <div class="month-details">
+                    <div class="month-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Сумма:</span>
+                            <span class="summary-value">6 050 ₽</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label" style="color: #ff9800;">Оплачено:</span>
+                            <span class="summary-value" style="color: #ff9800;">3 500 ₽</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label" style="color: #f44336;">Долг:</span>
+                            <span class="summary-value" style="color: #f44336;">2 550 ₽</span>
+                        </div>
+                    </div>
+                    <div class="month-breakdown">
+                        <div class="breakdown-item">
+                            <span>⚡ Электричество:</span>
+                            <span>1 150 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>💧 Холодная вода:</span>
+                            <span>450 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔥 Горячая вода:</span>
+                            <span>855 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔥 Газ:</span>
+                            <span>575 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🏠 Содержание:</span>
+                            <span>1 580 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🗑️ Мусор:</span>
+                            <span>420 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔧 Капремонт:</span>
+                            <span>600 ₽</span>
+                        </div>
+                    </div>
+                    <div class="month-actions">
+                        <button class="btn-primary" style="padding: 12px 24px; background: #ff9800; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 10px;" onclick="payOnline()">💳 Доплатить</button>
+                        <button class="btn-secondary" style="padding: 12px 24px; background: #f5f5f5; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="downloadReceipt()">📄 Квитанция</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ноябрь 2024 -->
+            <div class="month-card">
+                <div class="month-header">
+                    <h3>Ноябрь 2024</h3>
+                    <span class="status-badge paid">Оплачено</span>
+                </div>
+                <div class="month-details">
+                    <div class="month-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Сумма:</span>
+                            <span class="summary-value">5 987 ₽</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Дата оплаты:</span>
+                            <span class="summary-value">03.12.2024</span>
+                        </div>
+                    </div>
+                    <div class="month-breakdown">
+                        <div class="breakdown-item">
+                            <span>⚡ Электричество:</span>
+                            <span>1 120 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>💧 Холодная вода:</span>
+                            <span>442 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔥 Горячая вода:</span>
+                            <span>835 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔥 Газ:</span>
+                            <span>580 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🏠 Содержание:</span>
+                            <span>1 580 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🗑️ Мусор:</span>
+                            <span>420 ₽</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>🔧 Капремонт:</span>
+                            <span>600 ₽</span>
+                        </div>
+                    </div>
+                    <div class="month-actions">
+                        <button class="btn-secondary" style="padding: 12px 24px; background: #f5f5f5; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="downloadReceipt()">📄 Скачать квитанцию</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .monthly-payments {
+                background: linear-gradient(135deg, #ffffff 0%, #f8fcf9 100%);
+                padding: 28px;
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(46,125,50,0.12),
+                            0 2px 8px rgba(76,175,80,0.08);
+                border: 1px solid rgba(129,199,132,0.2);
+                margin-top: 24px;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .monthly-payments::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #81C784 0%, #66BB6A 50%, #4CAF50 100%);
+            }
+
+            .month-card {
+                background: linear-gradient(135deg, #f8fcf9 0%, #e8f5e9 100%);
+                padding: 24px;
+                border-radius: 18px;
+                margin-bottom: 18px;
+                border-left: 5px solid;
+                border-image: linear-gradient(180deg, #81C784 0%, #4CAF50 100%) 1;
+                box-shadow: 0 6px 20px rgba(46,125,50,0.1),
+                            0 2px 6px rgba(76,175,80,0.08);
+                transition: all 0.3s;
+                position: relative;
+            }
+
+            .month-card.current-month {
+                background: linear-gradient(135deg, #fff8e1 0%, #fff3c4 100%);
+                border-left-color: #FF9800;
+                border-image: linear-gradient(180deg, #FFB74D 0%, #FF9800 100%) 1;
+                box-shadow: 0 8px 24px rgba(255,152,0,0.15),
+                            0 2px 8px rgba(255,183,77,0.1);
+            }
+            
+            .month-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 28px rgba(76,175,80,0.15),
+                            0 4px 10px rgba(102,187,106,0.1);
+            }
+
+            .month-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+
+            .month-header h3 {
+                color: #2E7D32;
+                font-size: 18px;
+            }
+
+            .status-badge {
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: bold;
+            }
+
+            .status-badge.paid {
+                background: #4CAF50;
+                color: white;
+            }
+
+            .status-badge.unpaid {
+                background: #FF9800;
+                color: white;
+            }
+
+            .month-summary {
+                display: flex;
+                gap: 30px;
+                margin-bottom: 15px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #ddd;
+            }
+
+            .summary-item {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .summary-label {
+                color: #666;
+                font-size: 14px;
+            }
+
+            .summary-value {
+                color: #2E7D32;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .month-breakdown {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .breakdown-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 12px;
+                background: white;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+            .breakdown-item span:last-child,
+            .breakdown-item .amount {
+                color: #2E7D32;
+                font-weight: 600;
+            }
+
+            .month-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+        </style>
+
+        <div class="header">
+            <p><strong>📞 Диспетчер: 8 960 072 03 21</strong></p>
+            <p><strong>📧 Email: info@zelenaya-dolina.ru</strong></p>
+            <p>📍 г. Зеленодольск, ул. Шустова, д. 4А, пом. 15</p>
+        </div>
+    </div>
+
+    <script>
+        // КОНФИГУРАЦИЯ ТАРИФОВ
+        const tariffs = {
+            electricity: 5.96,    // ₽/кВт·ч
+            'cold-water': 20.92,  // ₽/м³
+            'hot-water': 44.86,  // ₽/м³
+            gas: 25.11            // ₽/м³
+        };
+        
+        // РЕГУЛЯРНОЕ ВЫРАЖЕНИЕ ДЛЯ ЧИСЕЛ
+        const numberRegex = /^-?\d*\.?\d+$/;
+        
+        // ФОРМАТИРОВАНИЕ ЧИСЛА В РУБЛЯХ
+        function formatRubles(value) {
+            return new Intl.NumberFormat('ru-RU', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+        
+        // ФОРМАТИРОВАНИЕ ЧИСЛА (целое)
+        function formatNumber(value) {
+            return new Intl.NumberFormat('ru-RU').format(value);
+        }
+        
+        // ОКРУГЛЕНИЕ ДО 2 ЗНАКОВ
+        function roundToTwo(value) {
+            return Math.round(value * 100) / 100;
+        }
+        
+        // ВАЛИДАЦИЯ И ПЕРЕСЧЕТ
+        function recalculateMeter(service) {
+            const input = document.querySelector(`input[data-service="${service}"]`);
+            const current = parseFloat(input.value);
+            const prev = parseFloat(input.dataset.prev);
+            const usageSpan = document.getElementById(`usage-${service}`);
+            
+            if (!isNaN(current) && !isNaN(prev) && current >= prev) {
+                const usage = current - prev;
+                if (usageSpan) {
+                    usageSpan.textContent = roundToTwo(usage);
+                }
+            }
+        }
+
+
+
