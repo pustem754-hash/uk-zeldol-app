@@ -1,0 +1,12 @@
+{
+  "powershell.scriptAnalysis.settings": {
+    "rules": {
+      "PSUseDeclaredVarsMoreThanAssignments": {
+        "severity": "none"
+      }
+    }
+  },
+  "powershell.codeFormatting.preset": "OTBS",
+  "files.encoding": "utf8"
+}
+

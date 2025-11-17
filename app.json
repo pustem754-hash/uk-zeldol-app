@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "УК Зелёная Долина",
+    "slug": "greenvalley",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon/app-icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/icon/app-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4CAF50"
+    },
+    "ios": {
+      "bundleIdentifier": "com.greenvalley.app",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.greenvalley.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon/app-icon.png",
+        "backgroundColor": "#4CAF50"
+      }
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-av",
+      "expo-image-picker"
+    ]
+  }
+}
