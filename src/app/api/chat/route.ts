@@ -14,11 +14,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Здесь интеграция с OpenAI или другим LLM
+    // Интеграция с OpenAI или другим LLM
     const systemPrompt = getGeneralPrompt();
 
-    // Заглушка для ответа (в продакшене — вызов OpenAI API)
-    const reply = `Маркиз получил ваше сообщение. Обработка...`;
+    // Fallback-решение для ответа (в рабочей версии — вызов OpenAI API)
+    const reply = `Ваше сообщение принято. Выполняется обработка...`;
 
     await deductCredit(userId);
 

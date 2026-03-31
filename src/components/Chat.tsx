@@ -9,7 +9,7 @@ export function Chat() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // В реальном приложении userId берётся из сессии
+  // Идентификатор пользователя (в рабочей версии определяется из сессии)
   const userId = 1;
 
   const handleSend = async () => {
@@ -17,7 +17,7 @@ export function Chat() {
 
     const hasCredits = await checkCredits(userId);
     if (!hasCredits) {
-      alert('У вас закончились кредиты!');
+      alert('Недостаточно кредитов для выполнения запроса.');
       return;
     }
 
@@ -27,7 +27,7 @@ export function Chat() {
     setLoading(true);
 
     try {
-      // Здесь вызов API для генерации ответа
+      // Вызов API для генерации ответа
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,7 +59,7 @@ export function Chat() {
             {msg.content}
           </div>
         ))}
-        {loading && <div className="text-gray-400">Маркиз думает...</div>}
+        {loading && <div className="text-gray-400">Обработка запроса...</div>}
       </div>
 
       <div className="flex gap-2">
@@ -67,7 +67,7 @@ export function Chat() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Напишите сообщение..."
+          placeholder="Введите сообщение..."
           className="flex-1 bg-gray-800 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-marquis-primary"
         />
         <button
