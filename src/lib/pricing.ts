@@ -8,6 +8,7 @@ export const PRICING = {
   VIDEO: 399,
   BACKGROUND_REMOVAL: 29,
   ALL_IN_ONE: 499,
+  VIRTUAL_TRY_ON: 399,
 } as const;
 
 export const PRICING_DISPLAY = {
@@ -15,6 +16,7 @@ export const PRICING_DISPLAY = {
   VIDEO: '399 ₽',
   BACKGROUND_REMOVAL: '29 ₽',
   ALL_IN_ONE: '499 ₽',
+  VIRTUAL_TRY_ON: '399 ₽',
 } as const;
 
 export type ServiceType = keyof typeof PRICING;

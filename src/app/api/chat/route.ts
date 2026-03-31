@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkCredits, deductCredit } from '@/lib/credits';
+import { checkCredits, deductCredit, isAdmin } from '@/lib/credits';
 import { getGeneralPrompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
     const { messages, userId } = await req.json();
 
-    const hasCredits = await checkCredits(userId);
-    if (!hasCredits) {
-      return NextResponse.json(
-        { error: 'Недостаточно средств на балансе' },
-        { status: 402 }
-      );
+    // Администраторы пропускают проверку баланса
+    if (!isAdmin(userId ?? 0)) {
+      const hasCredits = await checkCredits(userId);
+      if (!hasCredits) {
+        return NextResponse.json(
+          { error: 'Недостаточно средств на балансе' },
+          { status: 402 }
+        );
+      }
     }
 
     // Интеграция с OpenAI или другим LLM
@@ -20,7 +23,8 @@ export async function POST(req: NextRequest) {
     // Fallback-решение для ответа (в рабочей версии — вызов OpenAI API)
     const reply = `Ваше сообщение принято. Выполняется обработка...`;
 
-    await deductCredit(userId);
+    // Списание — администраторы пропускаются автоматически в deductCredit
+    await deductCredit(userId ?? 0);
 
     return NextResponse.json({ reply });
   } catch (error) {

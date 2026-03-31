@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getCreditBalance } from '@/lib/credits';
+import { getCreditBalance, isAdmin } from '@/lib/credits';
+import { PRICING_DISPLAY } from '@/lib/pricing';
 
 const navItems = [
   { label: 'Чат', href: '/', icon: '💬' },
@@ -21,31 +22,44 @@ export function Sidebar() {
     getCreditBalance(userId).then(setBalance);
   }, [userId]);
 
-  // Для userId === 1 (admin) отображать «0 ₽»
-  const displayBalance = userId === 1 ? '0 ₽' : `${balance ?? 0} ₽`;
+  // Для администраторов — отображать «∞» вместо суммы
+  const displayBalance = isAdmin(userId) ? '∞' : `${balance ?? 0} ₽`;
 
   const handleRefill = () => {
     alert('Функция пополнения баланса будет доступна в ближайшее время');
-    // TODO: Интеграция с платежной системой
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-marquis-secondary border-r border-gray-700 p-4">
+    <aside className="hidden md:flex flex-col w-64 flex-shrink-0 bg-marquis-secondary border-r border-gray-700 p-4">
       <div className="mb-8">
         <h2 className="text-xl font-bold text-marquis-accent">Маркиз</h2>
-        <p className="text-xs text-gray-400">AI Agent v0.8</p>
+        <p className="text-xs text-gray-400">AI Agent v11.0</p>
       </div>
 
       {/* Блок баланса */}
       <div className="mb-6 p-3 bg-gray-800 rounded-lg">
         <p className="text-xs text-gray-400 mb-1">Баланс</p>
         <p className="text-lg font-semibold text-white">{displayBalance}</p>
-        <button
-          onClick={handleRefill}
-          className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors text-sm"
-        >
-          Пополнить баланс
-        </button>
+        {!isAdmin(userId) && (
+          <button
+            onClick={handleRefill}
+            className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 pb-4 md:pb-3 rounded-lg transition-colors text-sm"
+          >
+            Пополнить баланс
+          </button>
+        )}
+      </div>
+
+      {/* Тарифы */}
+      <div className="mb-6 p-3 bg-gray-800/50 rounded-lg">
+        <p className="text-xs text-gray-400 mb-2">Тарифы</p>
+        <ul className="text-xs text-gray-300 space-y-1">
+          <li>📷 Фото — {PRICING_DISPLAY.PHOTO}</li>
+          <li>🎬 Видео — {PRICING_DISPLAY.VIDEO}</li>
+          <li>✂️ Удаление фона — {PRICING_DISPLAY.BACKGROUND_REMOVAL}</li>
+          <li>👗 Примерка — {PRICING_DISPLAY.VIRTUAL_TRY_ON}</li>
+          <li>📦 Всё сразу — {PRICING_DISPLAY.ALL_IN_ONE}</li>
+        </ul>
       </div>
 
       <nav className="flex-1 space-y-2">

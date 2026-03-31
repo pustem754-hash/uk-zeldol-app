@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { checkCredits, deductCredit } from '@/lib/credits';
+import { checkCredits, deductCredit, isAdmin } from '@/lib/credits';
 import { getSeoPrompt, getGeneralPrompt } from '@/lib/prompts';
 
 export function Chat() {
@@ -15,10 +15,13 @@ export function Chat() {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const hasCredits = await checkCredits(userId);
-    if (!hasCredits) {
-      alert('Недостаточно средств на балансе. Пожалуйста, пополните баланс.');
-      return;
+    // Администраторы пропускают проверку баланса
+    if (!isAdmin(userId)) {
+      const hasCredits = await checkCredits(userId);
+      if (!hasCredits) {
+        alert('Недостаточно средств на балансе. Пожалуйста, пополните баланс.');
+        return;
+      }
     }
 
     const userMessage = { role: 'user', content: input };
@@ -62,18 +65,18 @@ export function Chat() {
         {loading && <div className="text-gray-400">Обработка запроса...</div>}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 mb-6 md:mb-4">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Введите сообщение..."
-          className="flex-1 bg-gray-800 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-marquis-primary"
+          className="flex-1 bg-gray-800 rounded-lg px-4 py-3 pb-4 md:pb-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-marquis-primary"
         />
         <button
           onClick={handleSend}
           disabled={loading}
-          className="bg-marquis-primary px-6 py-2 rounded-lg hover:bg-marquis-primary/80 disabled:opacity-50 transition-colors"
+          className="bg-marquis-primary px-6 py-3 pb-4 md:pb-3 rounded-lg hover:bg-marquis-primary/80 disabled:opacity-50 transition-colors"
         >
           Отправить
         </button>
