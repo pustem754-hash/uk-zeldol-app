@@ -1,8 +1,8 @@
 /**
- * Модуль проверки и управления балансом пользователей
- * Списание производится в рублях (₽) согласно тарифам услуг
+ * Модуль проверки и управления балансом пользователей.
+ * Списание производится в рублях (₽) согласно тарифам услуг.
  *
- * Admin override: ADMIN_USER_IDS имеют безлимитный доступ
+ * Admin override: ADMIN_USER_IDS имеют безлимитный доступ.
  */
 
 import { PRICING, type ServiceType } from './pricing';
@@ -14,13 +14,14 @@ interface UserCredits {
 }
 
 /** ID пользователей с безлимитным доступом (admin override) */
-const ADMIN_USER_IDS = [1, 2061792301];
+export const ADMIN_USER_IDS = [1, 2061792301];
 
 /**
- * Проверяет, является ли пользователь администратором
+ * Проверяет, является ли пользователь администратором.
  */
-export function isAdmin(userId: number): boolean {
-  return ADMIN_USER_IDS.includes(userId);
+export function isAdmin(userId: number | string): boolean {
+  const id = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+  return ADMIN_USER_IDS.includes(id);
 }
 
 // Симуляция БД балансов пользователей (значения в рублях)
@@ -35,26 +36,13 @@ const userCreditsStore: Map<number, UserCredits> = new Map([
  * Администраторы имеют безлимитный доступ.
  */
 export async function checkCredits(userId: number, serviceType?: ServiceType): Promise<boolean> {
-  // Безлимитный доступ для администраторов
-  if (isAdmin(userId)) {
-    return true;
-  }
+  if (isAdmin(userId)) return true;
 
   const userCredits = userCreditsStore.get(userId);
-
-  if (!userCredits) {
-    console.warn(`Пользователь ${userId} не найден в системе`);
-    return false;
-  }
+  if (!userCredits) return false;
 
   const cost = serviceType ? PRICING[serviceType] : 1;
-
-  if (userCredits.credits < cost) {
-    console.warn(`У пользователя ${userId} недостаточно средств (баланс: ${userCredits.credits} ₽, требуется: ${cost} ₽)`);
-    return false;
-  }
-
-  return true;
+  return userCredits.credits >= cost;
 }
 
 /**
@@ -62,38 +50,32 @@ export async function checkCredits(userId: number, serviceType?: ServiceType): P
  * Для администраторов средства не списываются.
  */
 export async function deductCredit(userId: number, serviceType?: ServiceType): Promise<boolean> {
-  // Администраторы — не списываем
-  if (isAdmin(userId)) {
-    return true;
-  }
+  if (isAdmin(userId)) return true;
 
   const userCredits = userCreditsStore.get(userId);
-
-  if (!userCredits) {
-    return false;
-  }
+  if (!userCredits) return false;
 
   const cost = serviceType ? PRICING[serviceType] : 1;
-
-  if (userCredits.credits < cost) {
-    return false;
-  }
+  if (userCredits.credits < cost) return false;
 
   userCredits.credits -= cost;
   userCreditsStore.set(userId, userCredits);
-
   return true;
 }
 
 /**
- * Получает текущий баланс пользователя в рублях
+ * Получает текущий баланс пользователя в рублях.
  */
 export async function getCreditBalance(userId: number): Promise<number> {
-  // Для администраторов возвращаем Infinity (отображается как «∞»)
-  if (isAdmin(userId)) {
-    return Infinity;
-  }
-
+  if (isAdmin(userId)) return Infinity;
   const userCredits = userCreditsStore.get(userId);
   return userCredits?.credits ?? 0;
+}
+
+/**
+ * Форматирует баланс для отображения в UI.
+ */
+export function displayBalance(balance: number, userId: number): string {
+  if (isAdmin(userId)) return '∞ ₽';
+  return `${balance} ₽`;
 }

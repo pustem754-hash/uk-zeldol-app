@@ -22,17 +22,17 @@ export function PhotoGrid({ images }: PhotoGridProps) {
             {img.src ? (
               <img src={img.src} alt={img.alt} className="object-cover w-full h-full" />
             ) : (
-              <span className="text-gray-500 text-sm">📷 {img.alt}</span>
+              <span className="text-gray-500 text-sm">{img.alt}</span>
             )}
           </div>
         ))}
       </div>
 
-      {/* Пакет "ВСЁ СРАЗУ" */}
+      {/* Пакет «ВСЁ СРАЗУ» */}
       <div className="mt-6 p-4 bg-gray-800 rounded-lg border border-marquis-primary/30">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold">📦 Пакет «ВСЁ СРАЗУ»</h3>
+            <h3 className="text-lg font-semibold">Пакет «ВСЁ СРАЗУ»</h3>
             <p className="text-sm text-gray-400">Фото + Видео + Удаление фона</p>
           </div>
           <div className="text-right">

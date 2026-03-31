@@ -2,7 +2,22 @@
 
 import { useState, useCallback } from 'react';
 import { checkCredits, deductCredit, isAdmin } from '@/lib/credits';
-import { getSeoPrompt, getGeneralPrompt } from '@/lib/prompts';
+
+/** Regex для удаления эмодзи — полный Unicode-диапазон */
+const EMOJI_RE = new RegExp(
+  '[\\u{1F600}-\\u{1F64F}\\u{1F300}-\\u{1F5FF}\\u{1F680}-\\u{1F6FF}' +
+    '\\u{1F1E0}-\\u{1F1FF}\\u{2600}-\\u{27BF}\\u{FE00}-\\u{FE0F}' +
+    '\\u{1F900}-\\u{1F9FF}\\u{1FA00}-\\u{1FA6F}\\u{1FA70}-\\u{1FAFF}' +
+    '\\u{200D}\\u{20E3}\\u{E0020}-\\u{E007F}]',
+  'gu',
+);
+
+/**
+ * Удаляет все эмодзи из строки
+ */
+function stripEmoji(text: string): string {
+  return text.replace(EMOJI_RE, '').replace(/\s{2,}/g, ' ').trim();
+}
 
 export function Chat() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
@@ -16,10 +31,8 @@ export function Chat() {
   /**
    * handleCopyAll — копирует последний ответ ассистента в буфер обмена.
    * Формат: чистый текст без эмодзи и сленга.
-   * Структура: Наименование, Описание, Характеристики (через дефис), Теги (через запятую).
    */
   const handleCopyAll = useCallback(() => {
-    // Находим последний ответ ассистента
     const assistantMessages = messages.filter((m) => m.role === 'assistant');
     if (assistantMessages.length === 0) {
       setCopyStatus('Нет текста для копирования');
@@ -32,21 +45,23 @@ export function Chat() {
     // Пытаемся распарсить структурированный ответ
     let copyText = '';
 
-    // Пробуем найти секции в тексте
     const titleMatch = lastReply.match(/(?:Наименование|Название|Заголовок)[:\s]*(.+)/i);
-    const descMatch = lastReply.match(/(?:Описание)[:\s]*([\s\S]+?)(?=\n(?:Характеристик|Тег|Ключев|$))/i);
-    const specsMatch = lastReply.match(/(?:Характеристик[аи]?)[:\s]*([\s\S]+?)(?=\n(?:Тег|Ключев|$))/i);
+    const descMatch = lastReply.match(
+      /(?:Описание)[:\s]*([\s\S]+?)(?=\n(?:Характеристик|Тег|Ключев|$))/i,
+    );
+    const specsMatch = lastReply.match(
+      /(?:Характеристик[аи]?)[:\s]*([\s\S]+?)(?=\n(?:Тег|Ключев|$))/i,
+    );
     const tagsMatch = lastReply.match(/(?:Теги|Ключевые слова)[:\s]*(.+)/i);
 
     if (titleMatch || descMatch || specsMatch || tagsMatch) {
-      // Структурированный формат
       if (titleMatch) {
-        const title = (titleMatch[1] || '').trim();
+        const title = stripEmoji(titleMatch[1] || '');
         if (title) copyText += `Наименование: ${title}\n\n`;
       }
 
       if (descMatch) {
-        const description = (descMatch[1] || '').trim();
+        const description = stripEmoji(descMatch[1] || '');
         if (description) copyText += `Описание: ${description}\n\n`;
       }
 
@@ -54,10 +69,10 @@ export function Chat() {
         const specsRaw = (specsMatch[1] || '').trim();
         if (specsRaw) {
           const specs = specsRaw
-            .split(/\n|;|,/)
-            .map((s: string) => s.replace(/^[-–—•*\s]+/, '').trim())
+            .split(/\n|;/)
+            .map((s: string) => stripEmoji(s.replace(/^[-–—•*\s]+/, '')))
             .filter(Boolean);
-          copyText += `Характеристики:\n`;
+          copyText += 'Характеристики:\n';
           specs.forEach((spec: string) => {
             copyText += `- ${spec}\n`;
           });
@@ -66,25 +81,16 @@ export function Chat() {
       }
 
       if (tagsMatch) {
-        const tags = (tagsMatch[1] || '').trim();
+        const tags = stripEmoji(tagsMatch[1] || '');
         if (tags) copyText += `Теги: ${tags}\n`;
       }
     } else {
-      // Если структура не распознана — копируем весь текст как есть (полностью)
-      copyText = lastReply;
+      // Если структура не распознана — копируем весь текст
+      copyText = stripEmoji(lastReply);
     }
 
-    // Удаляем эмодзи из финального текста
-    copyText = copyText
-      .replace(/📌|💡|👔|🔥|✨|⭐|🎯|💰|🛒|📦|✅|❌|⚡|🏷️|📋|🔍|💎|🎁|👉|📊|🚀|💪|🌟|❤️|👍|🎉/g, '')
-      .replace(/[\u2600-\u27BF]/g, '')
-      .trim();
-
-    // Убираем возможные "undefined" / "null"
-    copyText = copyText.replace(/\bundefined\b/g, '').replace(/\bnull\b/g, '');
-
-    console.log('Копируемый текст:', copyText);
-    console.log('Длина текста:', copyText.length);
+    // Убираем артефакты
+    copyText = copyText.replace(/\bundefined\b/g, '').replace(/\bnull\b/g, '').trim();
 
     navigator.clipboard
       .writeText(copyText)
@@ -92,14 +98,13 @@ export function Chat() {
         setCopyStatus('Текст скопирован');
         setTimeout(() => setCopyStatus(null), 2000);
       })
-      .catch((err) => {
-        console.error('Ошибка копирования:', err);
+      .catch(() => {
         setCopyStatus('Ошибка копирования');
         setTimeout(() => setCopyStatus(null), 2000);
       });
   }, [messages]);
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (!input.trim()) return;
 
     // Администраторы пропускают проверку баланса
@@ -117,7 +122,6 @@ export function Chat() {
     setLoading(true);
 
     try {
-      // Вызов API для генерации ответа
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -132,7 +136,14 @@ export function Chat() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [input, messages, userId]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') handleSend();
+    },
+    [handleSend],
+  );
 
   const hasAssistantMessage = messages.some((m) => m.role === 'assistant');
 
@@ -143,9 +154,7 @@ export function Chat() {
           <div
             key={i}
             className={`p-3 rounded-lg ${
-              msg.role === 'user'
-                ? 'bg-marquis-primary/20 ml-12'
-                : 'bg-gray-800 mr-12'
+              msg.role === 'user' ? 'bg-marquis-primary/20 ml-12' : 'bg-gray-800 mr-12'
             }`}
           >
             <pre className="whitespace-pre-wrap font-sans">{msg.content}</pre>
@@ -154,7 +163,7 @@ export function Chat() {
         {loading && <div className="text-gray-400">Обработка запроса...</div>}
       </div>
 
-      {/* Кнопка «Скопировать всё» — появляется когда есть ответ */}
+      {/* Кнопка «Скопировать всё» */}
       {hasAssistantMessage && (
         <div className="flex items-center gap-2 mb-2">
           <button
@@ -163,24 +172,22 @@ export function Chat() {
           >
             Скопировать всё
           </button>
-          {copyStatus && (
-            <span className="text-sm text-green-400">{copyStatus}</span>
-          )}
+          {copyStatus && <span className="text-sm text-green-400">{copyStatus}</span>}
         </div>
       )}
 
-      <div className="flex gap-2 mb-6 md:mb-4">
+      <div className="flex gap-2 pb-6 md:pb-4">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          onKeyDown={handleKeyDown}
           placeholder="Введите сообщение..."
-          className="flex-1 bg-gray-800 rounded-lg px-4 py-3 pb-4 md:pb-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-marquis-primary"
+          className="flex-1 bg-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-marquis-primary"
         />
         <button
           onClick={handleSend}
           disabled={loading}
-          className="bg-marquis-primary px-6 py-3 pb-4 md:pb-3 rounded-lg hover:bg-marquis-primary/80 disabled:opacity-50 transition-colors"
+          className="bg-marquis-primary px-6 py-3 rounded-lg hover:bg-marquis-primary/80 disabled:opacity-50 transition-colors"
         >
           Отправить
         </button>

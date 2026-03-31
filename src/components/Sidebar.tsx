@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getCreditBalance, isAdmin } from '@/lib/credits';
 import { PRICING_DISPLAY } from '@/lib/pricing';
 
@@ -22,18 +22,17 @@ export function Sidebar() {
     getCreditBalance(userId).then(setBalance);
   }, [userId]);
 
-  // Для администраторов — отображать «∞» вместо суммы
-  const displayBalance = isAdmin(userId) ? '∞' : `${balance ?? 0} ₽`;
+  const displayBalance = isAdmin(userId) ? '∞ ₽' : `${balance ?? 0} ₽`;
 
-  const handleRefill = () => {
+  const handleRefill = useCallback(() => {
     alert('Функция пополнения баланса будет доступна в ближайшее время');
-  };
+  }, []);
 
   return (
-    <aside className="hidden md:flex flex-col w-64 flex-shrink-0 bg-marquis-secondary border-r border-gray-700 p-4">
+    <aside className="hidden md:flex flex-col w-64 flex-shrink-0 bg-marquis-secondary border-r border-gray-700 p-4 z-10">
       <div className="mb-8">
         <h2 className="text-xl font-bold text-marquis-accent">Маркиз</h2>
-        <p className="text-xs text-gray-400">AI Agent v11.0</p>
+        <p className="text-xs text-gray-400">AI Agent v12.4</p>
       </div>
 
       {/* Блок баланса */}
@@ -43,7 +42,7 @@ export function Sidebar() {
         {!isAdmin(userId) && (
           <button
             onClick={handleRefill}
-            className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 pb-4 md:pb-3 rounded-lg transition-colors text-sm"
+            className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg transition-colors text-sm"
           >
             Пополнить баланс
           </button>
@@ -54,11 +53,11 @@ export function Sidebar() {
       <div className="mb-6 p-3 bg-gray-800/50 rounded-lg">
         <p className="text-xs text-gray-400 mb-2">Тарифы</p>
         <ul className="text-xs text-gray-300 space-y-1">
-          <li>📷 Фото — {PRICING_DISPLAY.PHOTO}</li>
-          <li>🎬 Видео — {PRICING_DISPLAY.VIDEO}</li>
-          <li>✂️ Удаление фона — {PRICING_DISPLAY.BACKGROUND_REMOVAL}</li>
-          <li>👗 Примерка — {PRICING_DISPLAY.VIRTUAL_TRY_ON}</li>
-          <li>📦 Всё сразу — {PRICING_DISPLAY.ALL_IN_ONE}</li>
+          <li>Фото — {PRICING_DISPLAY.PHOTO}</li>
+          <li>Видео — {PRICING_DISPLAY.VIDEO}</li>
+          <li>Удаление фона — {PRICING_DISPLAY.BACKGROUND_REMOVAL}</li>
+          <li>Примерка — {PRICING_DISPLAY.VIRTUAL_TRY_ON}</li>
+          <li>Всё сразу — {PRICING_DISPLAY.ALL_IN_ONE}</li>
         </ul>
       </div>
 
