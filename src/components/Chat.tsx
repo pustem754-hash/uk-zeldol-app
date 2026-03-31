@@ -17,7 +17,7 @@ export function Chat() {
 
     const hasCredits = await checkCredits(userId);
     if (!hasCredits) {
-      alert('Недостаточно кредитов для выполнения запроса.');
+      alert('Недостаточно средств на балансе. Пожалуйста, пополните баланс.');
       return;
     }
 

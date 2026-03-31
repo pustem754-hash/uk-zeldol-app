@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     const hasCredits = await checkCredits(userId);
     if (!hasCredits) {
       return NextResponse.json(
-        { error: 'Недостаточно кредитов' },
+        { error: 'Недостаточно средств на балансе' },
         { status: 402 }
       );
     }
