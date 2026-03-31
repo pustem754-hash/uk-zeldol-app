@@ -13,7 +13,7 @@ export function Sidebar() {
   const [active, setActive] = useState('/');
 
   return (
-    <aside className="flex flex-col w-64 bg-marquis-secondary border-r border-gray-700 p-4">
+    <aside className="hidden md:flex flex-col w-64 bg-marquis-secondary border-r border-gray-700 p-4">
       <div className="mb-8">
         <h2 className="text-xl font-bold text-marquis-accent">Маркиз</h2>
         <p className="text-xs text-gray-400">AI Agent v0.8</p>
