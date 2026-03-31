@@ -11,8 +11,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru">
       <body className="bg-marquis-secondary text-white min-h-screen">
         <div className="flex min-h-screen">
+          {/* Sidebar — фиксированная ширина, не налезает на контент */}
           <Sidebar />
-          <main className="flex-1 w-full max-w-none px-4 md:px-8 py-6">{children}</main>
+          {/* Main content — занимает оставшееся пространство */}
+          <main className="flex-1 w-full max-w-none px-4 md:px-8 py-6 overflow-x-hidden">
+            {children}
+          </main>
         </div>
       </body>
     </html>
