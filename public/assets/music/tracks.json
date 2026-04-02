@@ -1,0 +1,28 @@
+{
+  "tracks": [
+    {
+      "id": "energy",
+      "name": "Энергия",
+      "file": "/assets/music/energy.mp3",
+      "size": "7.9MB",
+      "duration": 180,
+      "description": "Энергичный трек для динамичных роликов"
+    },
+    {
+      "id": "drive",
+      "name": "Драйв",
+      "file": "/assets/music/drive.mp3",
+      "size": "10MB",
+      "duration": 240,
+      "description": "Драйвовый трек для активных продаж"
+    },
+    {
+      "id": "none",
+      "name": "Без звука",
+      "file": null,
+      "size": "0MB",
+      "duration": 0,
+      "description": "Видео без музыкального сопровождения"
+    }
+  ]
+}
