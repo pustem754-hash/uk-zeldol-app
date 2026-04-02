@@ -107,8 +107,8 @@ export default function VideoMaster({ userId }: { userId: number }) {
   const videoPrice = PRICING.VIDEO;
 
   return (
-    <div className="w-full max-w-none px-4 md:px-8 py-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full max-w-none">
+      <div className="w-full">
         <h1 className="text-3xl font-bold mb-6">Video Master</h1>
 
         {/* Выбор маркетплейса */}
@@ -272,7 +272,7 @@ export default function VideoMaster({ userId }: { userId: number }) {
         {generatedVideoUrl && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-3">Ваше видео готово!</h2>
-            <div className="max-w-md mx-auto">
+            <div className="max-w-2xl">
               <video
                 src={generatedVideoUrl}
                 controls

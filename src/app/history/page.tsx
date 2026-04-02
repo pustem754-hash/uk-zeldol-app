@@ -23,7 +23,7 @@ export default function HistoryPage() {
 
   if (loading) {
     return (
-      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-6">
+      <div className="w-full max-w-none">
         <h1 className="text-3xl font-bold mb-6">История видео</h1>
         <p>Загрузка...</p>
       </div>
@@ -31,13 +31,13 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-6">
+    <div className="w-full max-w-none">
       <h1 className="text-3xl font-bold mb-6">История видео</h1>
 
       {history.length === 0 ? (
         <p className="text-gray-500">История пуста. Создайте первое видео!</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {history.map(item => {
             const format = VIDEO_FORMATS[item.marketplace];
             return (
