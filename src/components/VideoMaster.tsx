@@ -272,7 +272,7 @@ export default function VideoMaster({ userId }: { userId: number }) {
         {generatedVideoUrl && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-3">Ваше видео готово!</h2>
-            <div className="max-w-2xl">
+            <div className="w-full max-w-none">
               <video
                 src={generatedVideoUrl}
                 controls
