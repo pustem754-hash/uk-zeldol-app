@@ -5,3 +5,35 @@
 body {
   font-family: 'Inter', sans-serif;
 }
+
+/* === FORCE WIDE SCREEN — v13.2 === */
+
+/* Remove ALL max-width constraints from main content */
+main {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Wide container utility */
+.wide-container {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Ensure no inner containers restrict width */
+main > div,
+main > section {
+  max-width: none !important;
+}
+
+/* Force all form inputs to stretch */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+}

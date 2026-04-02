@@ -107,27 +107,27 @@ export default function VideoMaster({ userId }: { userId: number }) {
   const videoPrice = PRICING.VIDEO;
 
   return (
-    <div className="w-full max-w-none">
+    <div className="w-full">
       <div className="w-full">
         <h1 className="text-3xl font-bold mb-6">Video Master</h1>
 
         {/* Выбор маркетплейса */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-3">Выберите маркетплейс</h2>
-          <div className="flex gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
             <button
               onClick={() => setMarketplace('ozon')}
-              className={`flex-1 p-6 rounded-lg border-2 transition-all ${
+              className={`w-full p-8 rounded-xl border-2 transition-all ${
                 marketplace === 'ozon'
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-blue-300'
+                  ? 'border-blue-500 bg-blue-900/30 shadow-lg shadow-blue-600/20 ring-2 ring-blue-400'
+                  : 'border-gray-700 bg-gray-800 hover:border-blue-400 hover:bg-gray-750'
               }`}
             >
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <img src="/assets/logos/ozon.svg" alt="Ozon" className="w-12 h-12" />
-                <span className="text-lg font-bold">Ozon</span>
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <img src="/assets/logos/ozon.svg" alt="Ozon" className="w-14 h-14" />
+                <span className="text-xl font-bold">Ozon</span>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-gray-400">
                 {VIDEO_FORMATS.ozon.width}x{VIDEO_FORMATS.ozon.height} ({VIDEO_FORMATS.ozon.aspectRatio})
               </div>
               <div className="text-xs text-gray-500 mt-1">Квадратный формат</div>
@@ -135,17 +135,17 @@ export default function VideoMaster({ userId }: { userId: number }) {
 
             <button
               onClick={() => setMarketplace('wildberries')}
-              className={`flex-1 p-6 rounded-lg border-2 transition-all ${
+              className={`w-full p-8 rounded-xl border-2 transition-all ${
                 marketplace === 'wildberries'
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-950'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-purple-300'
+                  ? 'border-purple-500 bg-purple-900/30 shadow-lg shadow-purple-600/20 ring-2 ring-purple-400'
+                  : 'border-gray-700 bg-gray-800 hover:border-purple-400 hover:bg-gray-750'
               }`}
             >
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <img src="/assets/logos/wildberries.svg" alt="Wildberries" className="w-12 h-12" />
-                <span className="text-lg font-bold">Wildberries</span>
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <img src="/assets/logos/wildberries.svg" alt="Wildberries" className="w-14 h-14" />
+                <span className="text-xl font-bold">Wildberries</span>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-gray-400">
                 {VIDEO_FORMATS.wildberries.width}x{VIDEO_FORMATS.wildberries.height} ({VIDEO_FORMATS.wildberries.aspectRatio})
               </div>
               <div className="text-xs text-gray-500 mt-1">Вертикальный формат (Reels)</div>

@@ -23,7 +23,7 @@ export default function HistoryPage() {
 
   if (loading) {
     return (
-      <div className="w-full max-w-none">
+      <div className="w-full">
         <h1 className="text-3xl font-bold mb-6">История видео</h1>
         <p>Загрузка...</p>
       </div>
@@ -31,7 +31,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="w-full max-w-none">
+    <div className="w-full">
       <h1 className="text-3xl font-bold mb-6">История видео</h1>
 
       {history.length === 0 ? (
